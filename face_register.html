@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>用户注册</title>
+		<script src="js/jquery-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+			<script src="js/jquery-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery.particleground.min.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="css/styleAI.css" />
+        <script src="js/base.js"></script>
+		<style type="text/css">
+			#dianji:hover{
+				transition: 0.5s;
+				background: skyblue;
+			}
+			.sss{
+				display: inline-block;
+				line-height:100px ;
+				border-radius: 100%; 
+				width: 200px;
+				margin: auto; 
+				height: 200px; 
+				border: 1px solid white;
+				margin-top: 10%;
+			}
+			#photo:hover{
+				transition: 0.5s;
+				background: skyblue;
+			}
+			.sss{
+				display: inline-block;
+				line-height:100px ;
+				border-radius: 100%; 
+				width: 200px;
+				margin: auto; 
+				height: 200px; 
+				border: 1px solid white;
+				margin-top: 10%;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="adcenter"><script src="http://www.cssmoban.com/include/new/ggad2_728x90.js"></script></div>
+        <div id="large-header" class="large-header">
+					<canvas id="demo-canvas"></canvas> 
+        </div>
+	    <audio controls autoplay>
+        <source id="tts_source" type="audio/mpeg" src="http://tts.baidu.com/text2audio/text2audio?lan=zh&amp;ie=UTF-8&amp;spd=6&amp;text="style="position: absolute;left: 500px;top: 540px;">
+        </audio>
+		<div id="context">
+			<div class="intro">
+				<h1>输入用户信息</h1>
+				<form id="renlian" method="post">
+					用户名: <input type="text" placeholder="由18位以内数字和字母组成" name="text" id="user_id" maxlength="18" style="font-size: 14px;"><br><br>
+				    <span style="position: relative;">点击上传图片(文件格式必须为：png/jpg/jpeg)
+				    <input type="file" name="image" value="" id="uploading" multiple="multiple" onchange="upload()" style="opacity: 0;width: 100%;position: absolute;height: 100%;display: block;top: 0px;" />
+				    </span><br><br><br>
+				    <div id="localImg">  </div><br><br><br><br>
+				</form>
+				<video id="v" style="width:32%;height:28%;position: absolute;left: 34%;top: 52%;"></video>
+				    <source src="img/img111.jpg" type="video/mp4"></source>
+				<canvas id="canvas" style="width: 32%;height:28%;position: absolute;left: 34%;top: 52%;"></canvas>
+				<div id="dianji" style="border: 1px solid white;left: 40%;top: 50%;width: 140px;height: 40px;line-height: 40px;border-radius: 15px; margin: auto;">注册/更新</div><br>
+				<div id="photo" style="border: 1px solid white;left: 50%;top: 50%;width: 140px;height: 40px;line-height: 40px;border-radius: 15px; margin: auto;"onclick="handle()">打开相机</div>
+			</div>
+
+		</div>
+	</body>
+	<script type="text/javascript">
+	window.onload = function init() {
+    	speckText("当前为用户注册板块");
+    }
+    //语音播报
+    function speckText(str){
+    	/*
+        var url = "http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=" + encodeURI(str);        // baidu
+        var n = new Audio(url);
+        n.src = url;
+        n.play();*/
+	    var s = document.getElementById("tts_source");
+	    s.src = "http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=" + str;
+	    s.parentNode.load();
+    }
+		var flag=false;
+		var form ;
+	    var form = new FormData();
+        let videoPlaying = false;
+        var mediaStreamTrack=null;
+        let v = document.getElementById('v');
+        var autosubmit=false,handleflag=false;
+		function handle(){
+			if(videoPlaying){
+				form=new FormData();
+				let canvas = document.getElementById('canvas');
+                canvas.width = v.videoWidth;
+                canvas.height = v.videoHeight;
+                canvas.getContext('2d').drawImage(v, 0, 0);
+                imgdata = canvas.toDataURL('image/png');
+                form.append('image0',imgdata);
+                form.append('num',1);
+                flag=true;
+                //document.getElementById('img').src=imgdata;
+                //document.getElementById('img').style.width="160px";
+                //document.getElementById('img').style.height="120px";
+                document.getElementById('uploading').href=imgdata;
+                mediaStreamTrack.stop();
+		        videoPlaying=false;
+			    document.getElementById('photo').innerHTML="打开相机";
+			}
+			else{
+			    document.getElementById('photo').innerHTML="拍照";
+				document.getElementById('canvas').width=0;
+				document.getElementById('canvas').height=0;
+				// 老的浏览器可能根本没有实现 mediaDevices，所以我们可以先设置一个空的对象
+		        if (navigator.mediaDevices === undefined) {
+		            navigator.mediaDevices = {};
+		        }
+		        if (navigator.mediaDevices.getUserMedia === undefined) {
+		            navigator.mediaDevices.getUserMedia = function (constraints) {
+		                // 首先，如果有getUserMedia的话，就获得它
+		                var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+		                // 一些浏览器根本没实现它 - 那么就返回一个error到promise的reject来保持一个统一的接口
+		                if (!getUserMedia) {
+		                    return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+		                }
+
+		            // 否则，为老的navigator.getUserMedia方法包裹一个Promise
+		                return new Promise(function (resolve, reject) {
+		                getUserMedia.call(navigator, constraints, resolve, reject);
+		                });
+		            }
+		        }
+		        //
+		        var img = document.createElement("img");
+			    var imgObjPreview = document.getElementById("localImg");
+			    imgObjPreview.innerHTML = "";
+                img.style.width="50px";
+                img.style.height="60px";
+                img.style.marginRight="10px";
+                img.style.marginTop="10px";
+                img.id="img0";
+                imgObjPreview.appendChild(img);
+
+		        const constraints = {video: true,audio: false};
+		        let promise = navigator.mediaDevices.getUserMedia(constraints);
+		        promise.then(stream => {
+		        // 旧的浏览器可能没有srcObject
+		            if ("srcObject" in v) 
+		            	v.srcObject = stream;
+		            else 
+		            // 防止再新的浏览器里使用它，应为它已经不再支持了
+		            v.src = window.URL.createObjectURL(stream);
+		            v.onloadedmetadata = function (e) {
+		            	v.play();
+		                videoPlaying = true;
+		            };
+		            mediaStreamTrack=stream.getTracks()[0];
+		        }).catch(err => {
+		            console.error(err.name + ": " + err.message);
+		        })
+			}
+
+		}
+		function upload() {
+			form=new FormData();
+		    document.getElementById('canvas').width=0;
+		    document.getElementById('canvas').height=0;
+			var dom = document.getElementById("uploading");
+			var pics;
+			var files = dom.files;
+            var imgObjPreview = document.getElementById("localImg");
+            //3、回显
+            imgObjPreview.innerHTML = "";
+            var filePath = dom.value;
+            var fileFormat = filePath.substring(filePath.lastIndexOf(".")).toLowerCase();
+            if(!fileFormat.match(/.png|.jpg|.jpeg/)) {
+            	speckText("文件格式错误");
+				//alert('上传错误,文件格式必须为：png/jpg/jpeg');
+				flag=false;return;
+			}
+			else flag=true;
+            $.each(files,function(key,value){
+                //每次都只会遍历一个图片数据
+                var d=null;
+                var img = document.createElement("img");
+                var imgObjPreview = document.getElementById("localImg");
+                var fr = new FileReader();
+                fr.readAsDataURL(value);//读取文件
+                fr.onload = function(){
+                	d=this.result;
+                    var t="image"+key;
+			        form.append(t,d);
+                    img.src=this.result;
+                    img.style.width="50px";
+                    img.style.height="36%";
+                    img.style.marginRight="10px";
+                    img.style.marginTop="10px";
+                    img.id=key+"img";
+                    imgObjPreview.appendChild(img);
+                }
+                pics=key;
+        	})
+        	form.append('num',pics+1);
+		}
+		$(function() {
+			$("#dianji").click(function() {
+				var name = document.getElementById("user_id").value;
+				form.append('name',name);
+				if(name==''){
+					//alert('用户名不能为空');
+					speckText("警告：用户名不能为空");
+					return;
+				}
+				if(!flag){
+					speckText("警告：至少上传一张照");
+					//alert('请至少上传一张照');
+					return;
+				}
+				$.ajax({
+					url: basePath+"/FaceRegister",
+					type: 'post',
+					cache: false,
+					fileElementId: ['uploading'],
+					data: form,//new FormData($('#renlian')[0]),
+					processData: false,
+					contentType: false,
+					dataType: "json",
+					beforeSend: function() {
+						uploading = true;
+					},
+					success: function(data) {
+						if(data.status==200){
+							speckText("用户人脸注册/更新成功");
+							//alert('用户人脸注册/更新成功');
+							//window.location.href="javascript:history.go(-1)";
+						}else{
+							speckText("用户人脸注册/更新失败");
+							//alert('用户人脸注册/更新失败');
+						}
+						
+					},
+					error(xhr,status,error){
+						speckText("后台服务异常");
+						//alert('后台服务异常');
+						return;
+					}
+				});
+
+			});
+		});
+	</script>
+<script src="js/TweenLite.min.js"></script>
+<script src="js/EasePack.min.js"></script>
+<script src="js/rAF.js"></script>
+<script src="js/demo-1.js"></script> 
+
+<script>
+    /*
+    //随机粒子背景 没用上，删除前面四个script就用上了
+    $(document).ready(function() {
+        $('#context').particleground({
+            dotColor: '#5cbdaa',
+            lineColor: '#5cbdaa'
+    });
+    */
+    //位置偏移控制
+	$('.intro').css({
+	    'margin-top': -($('.intro').height() / 2)
+    });
+</script>>
+</html>

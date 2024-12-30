@@ -1,0 +1,603 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Access-Control-Allow-Origin" content="*">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <style type="text/css"></style>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?type=webgl&v=1.0&ak=yuRbdk7ka2AHFUmPgxDiXj8575HdcXcp"></script>   
+    <script src="assets/js/jquery-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+    <script src="assets/js/jquery.particleground.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="assets/js/lightbox-plus-jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" src="js/PSOFun.js"> </script>
+    <link rel="stylesheet" href="assets/css/style-starter.css">
+    <style>
+
+        html,body{
+            width: 100%;
+            height: 98%;
+            padding: 0;
+        }
+        #allmap{
+            width: 78%;
+            height: 60%;
+            margin-left: 11%;
+            margin-right: 11%;
+            overflow: hidden;
+            border:4px solid #AFAFAF;
+            border-radius:5px;
+            font-family: "微软雅黑";
+        }
+    </style>
+</head>
+<body>
+<section class="w3l-bootstrap-header">
+  <nav class="navbar navbar-expand-lg navbar-light py-lg-3 py-2">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">物流配送末端路径规划</a>
+      <a name="homePosition"/>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon fa fa-bars"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#homePosition">首页</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#mapPosition">路径规划</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#aboutPosition">关于我们</a>
+          </li>
+        
+          <li class="nav-item">
+            <a class="nav-link" href="#contactPosition">联系我们</a>
+          </li>
+        </ul>
+        
+      </div>
+    </div>
+  </nav>
+</section>
+
+<section class="w3l-top-breadcrum">
+  <div class="breadcrum-bg">
+    <div class="container py-3">
+     </div>
+  </div>
+</section>
+
+
+
+<section class="w3l-main-banner" id="home">
+  <div class="companies20-content" onclick="location.href='#mapPosition'" style="cursor:pointer;">
+    <div class="companies-wrapper">
+        <div class="item">
+         
+            <div class="slider-info banner-view text-center">
+              <div class="banner-info container">
+                <!--
+                <h3 class="banner-text mt-5">物流配送末端路径规划
+                  </h3>
+                  <p class="my-4 mb-5">开始使用</p><br>
+               -->
+              </div>
+            </div>
+          
+        </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="w3l-about ">
+<div class="skills-bars pt-5 pb-1">
+    <div class="container pb-md-4">
+    </div>
+    <div class="container pt-md-5 pb-md-2">
+        <div class="heading text-center mx-auto">
+            <a name="mapPosition"/>
+            <h3 class="head">欢迎使用路线规划功能</h3>
+            <p class="my-3 head"> 您可以通过上传.xls文件或者手动输入的方式输入数据。若同时使用两种数据输入方式，将以文件为准。</p>
+        </div>
+    </div>
+</div>
+</section>
+<!--地图放置于此-->
+<div id='allmap'></div>
+<script type="text/javascript">
+    //路线查询的结果：时间和距离
+    var Result;
+    var filePath ="";//excel文件url
+    var basePath="http://141.164.50.75:8083/AIProject/FaceDetect";//141.164.50.75:8083/AIProject/FaceDetect";//192.168.0.104:8080/AIProject/FaceDetect";
+    var uploading=false;//标记后台是否在运算中
+
+    //初始化地图并自定义样式
+    var map = new BMapGL.Map("allmap");
+    map.centerAndZoom(new BMapGL.Point(116.404, 39.915), 12);
+    //map.setMapStyle({styleJson: myStyleJson });
+
+    //标记点
+    var markers= new Array();
+    var lastClick=-1;//用于标记上次查询路线的点击位置
+    var distance,route,x,y;
+    var markerPath="assets/images/marker";//图标文件路径
+
+    //路线查询
+    var transit = new BMapGL.DrivingRoute(map, {renderOptions: {map: map},onSearchComplete: searchComplete});
+
+    // 创建信息窗口
+    var infoWindow;
+    var info="";
+    var infoPoint;
+    var optsIndex;
+    var opts = [{width: 200,height: 100,title:"配送中心"},{width: 200,height: 100,title:"配送点"}];//样式
+
+    //绘制路线
+    var color=['#E02020','#FA6400','#F7B500','#6DD400','#44D7B6','#32C5FF','#0091FF','#6236FF','#B620E0','#6D7278'];//每个颜色对应一辆车，车辆数目不超过10
+
+
+    //开始计算路程按钮的响应函数
+    function onStartButton(){
+        var form = new FormData();
+        var filrarr;
+        var flag=false;//标记数据是否为手动输入
+        var need=new Array();
+        var load;
+        if(filePath=="") {
+            //1、检查手动输入数据是否正确
+            var input1 = trim(document.getElementById("textInput1").value);
+            var input2 = trim(document.getElementById("textInput2").value);
+            var input3 = trim(document.getElementById("textInput3").value);
+            var input4 = trim(document.getElementById("textInput4").value);
+            if(input1==""&&input2==""&&input3==""&&input4==""){
+                alert("请先输入数据！");
+                return;
+            }
+            else if(input1==""||input2==""||input3==""||input4==""){
+                alert("数据不全，请补充！");
+                return;
+            }
+            var str2 = input2.split(" ");
+            var str3 = input3.split(" ");
+            var str4 = input4.split(" ");
+            if(str2.length!=str3.length){
+                alert("输入的配送点地址和配送点需求不匹配"+"\n"+"请修改!");
+                return;
+            }
+            //2、将地址进行分解，放入form中
+            form.append("type",str2.length);
+            form.append("address0",input1);
+            var needNum=0;
+            for(var i = 0; i < str3.length; i++){
+                form.append("address"+(i+1),str2[i]);
+                need.push(parseInt(str3[i]));
+                needNum+=parseInt(str3[i]);
+            }
+            load=parseInt(str4[0]);
+            flag=true;
+        }
+        else{
+            filrarr = document.getElementById("uploadFile").files;
+            /*
+            //使用网页中传入的文件
+            form.append("type", 0);
+            form.append("file", filrarr[0]);*/
+
+            //使用本地默认文件
+            form.append("type", -1);
+
+        }
+        //上传文件type=0
+        //输入数据type=数据规模
+        $.ajax({
+            type: "post",
+            url: basePath ,
+            dataType: "json",
+            data: form,//{"text":text,"image": imgdata}, //new FormData($('#renlian')[0]) ,
+            processData: false,
+            contentType: false,
+            beforeSend: function() {
+                uploading = true;
+            },
+            success: function(res) {
+                if(res.status=="200"){
+                    console.log("运行中...");
+                    x=res.data.x;
+                    y=res.data.y;
+                    //关于坐标
+                    //x,y用于输出点标记位置,为经纬度坐标——5
+                    //px,py用于计算,为墨卡托平面坐标——6
+                    if(flag)
+                        Result=PSO(res.data.Dis,res.data.px,res.data.py,load,need);
+                    else
+                        Result=PSO(res.data.Dis,res.data.px,res.data.py,res.data.load[0],res.data.need);
+                    show();
+                }
+                else{
+                    
+                }
+            },
+            error(xhr,status,error){
+                document.getElementById("elapsed_result").innerHTML = "后台服务异常";
+                alert('后台服务异常');
+                return;
+            }
+        })
+        
+    }
+     //判断图片是否正确上传
+    function test() {
+        var fr = new FileReader;
+        filePath="";
+        var tmp = document.querySelector("#uploadFile").value;
+        fileFormat = tmp.substring(filePath.lastIndexOf(".")).toLowerCase();
+        if(!fileFormat.match(/.xls|.xlsx/)) {
+            alert("文件格式错误！"+"\n"+"仅支持.xls和.xlsx文件");
+            document.querySelector("#uploadFile").value="";
+        } 
+        else filePath=tmp;
+    }
+    function show(){
+        var totalTime=0;
+        var tang=0;
+        var alertStr="";
+        distance=Result.bestDistance;
+        route=Result.bestRoute;
+        console.log(distance);
+        console.log(route);   
+        //调整地图的位置和范围——地图中心为配送中心
+        map.centerAndZoom(new BMapGL.Point(x[0],y[0]), 14);
+        //清除地图上所有的覆盖物
+        map.clearOverlays();
+        //清空坐标点列表,定义配送中心
+        markers= new Array();
+        lastMarker=-1;
+        var myIcon = new BMapGL.Icon(markerPath+"0.png", new BMapGL.Size(70, 35));   
+        var marker = new BMapGL.Marker(new BMapGL.Point(x[0],y[0]),{icon: myIcon});
+        marker.addEventListener('click',OnCenterClick);
+        map.addOverlay(marker);
+        markers.push(marker);
+
+        //通过颜色深浅标记配送顺序
+        for(var i=0;i<route.length;i++){
+            var lastPoint=new BMapGL.Point(x[0],y[0]);
+            if(route[i].length>0) tang++;
+            for(var j=0;j<route[i].length;j++){
+                //创建点标记
+                myIcon = new BMapGL.Icon(markerPath+(i+1)+".png", new BMapGL.Size(20, 28)); 
+                var thisPoint =new BMapGL.Point(x[route[i][j]],y[route[i][j]]);
+                marker= new BMapGL.Marker(new BMapGL.Point(x[route[i][j]],y[route[i][j]]),{icon: myIcon});//, {icon: myIcon}
+                // 在地图上添加点标记
+                map.addOverlay(marker);
+                markers.push(marker);
+                // 点标记添加点击事件
+                marker.addEventListener('click',OnClick);
+                //绘制路线
+                var s=0.2+(j+1)/route[i].length*0.8;
+                var polyline = new BMapGL.Polyline([lastPoint,thisPoint], {
+                    strokeColor: color[i],
+                    strokeWeight: 3,
+                    strokeOpacity: s
+                });
+                map.addOverlay(polyline);
+                lastPoint=thisPoint;
+            }
+            if(route[i].length>0){
+                var thisPoint=new BMapGL.Point(x[0],y[0]);
+                var polyline = new BMapGL.Polyline([lastPoint,thisPoint], {
+                    strokeColor: color[i],
+                    strokeWeight: 3,
+                    strokeOpacity: 1
+                });
+                map.addOverlay(polyline);
+            }
+        }
+        alertStr="本次出行共计"+tang+"趟"+"\n" +"预计行驶路程为";
+        if(parseInt(distance)>1000)
+            alertStr+=parseInt(distance)/1000+"千米";
+        else
+            alertStr+=distance+"米";
+        alert(alertStr);
+    }
+
+    //用户标记点击响应函数
+    function  OnClick(e) {
+        var p = e.target;//p是marker
+        var pt = p.latLng;
+        infoPoint=pt;
+        var index = (markers|| []).findIndex((value) => value.latLng === p.latLng);
+        lastClick=index;
+        var lastIndex=FindLastIndex(index);
+        var start=new BMapGL.Point(markers[lastIndex].latLng.lng,markers[lastIndex].latLng.lat);
+        var end=new BMapGL.Point(pt.lng,pt.lat);
+        optsIndex=1;
+        transit.search(start, end);
+    }
+    //配送中心点响应函数
+    function  OnCenterClick(e) {
+        var p = e.target;
+        var pt = p.latLng;
+        infoPoint=pt;
+        var index = (markers|| []).findIndex((value) => value.latLng === p.latLng);
+        //查找上个点击的店是否为每辆车最后一个配送的客户点
+        var num=0;
+        for(var i=0;i<route.length;i++){
+            num+=route[i].length;
+            if(num==lastClick){
+                optsIndex=0;
+                var start=new BMapGL.Point(markers[lastClick].latLng.lng,markers[lastClick].latLng.lat);
+                var end=new BMapGL.Point(pt.lng,pt.lat);
+                transit.search(start, end);
+            }
+            else{
+                //点击配送中心的消息显示
+                var geoc = new BMapGL.Geocoder();
+                geoc.getLocation(infoPoint, function(rs){
+                    var addComp = rs.addressComponents;
+                    console.log(addComp);
+                    info=addComp.city + "\n"+ addComp.district + "\n" + addComp.street + "\n"+ addComp.streetNumber;
+                    infoWindow= new BMapGL.InfoWindow(info, {width: 200,height: 50,title:"配送中心"});
+                    map.openInfoWindow(infoWindow, rs.point); 
+                });
+            }
+        }
+        lastClick=index;
+    }
+
+    //找到点击的标记点的上一个点，以标明行车路线
+    function FindLastIndex(index){
+        var num=0;
+        var mark=index-1;
+        for(var i=0;i<route.length;i++){
+            if(index==num+1){
+                mark=0;
+            }
+            num+=route[i].length;
+        }
+        return mark;
+    }
+
+    //完成路线查询的响应函数
+    function searchComplete(results){
+        if (transit.getStatus() != BMAP_STATUS_SUCCESS){
+            return ;
+        }
+        var plan = results.getPlan(0);
+        var geoc = new BMapGL.Geocoder();
+        geoc.getLocation(infoPoint, function(rs){
+            var addComp = rs.addressComponents;
+            info=addComp.city + "\n"+ addComp.district + "\n" + addComp.street + "\n"+ addComp.streetNumber+"<br />";
+            info=info+"该路线长"+plan.getDistance(true)+"<br />"+"预计行驶时间为"+plan.getDuration(true) ;
+            infoWindow= new BMapGL.InfoWindow(info, opts[optsIndex]);
+            map.openInfoWindow(infoWindow, rs.point); 
+        });
+
+    }
+
+    function trim(str){ 
+        //删除左右两端的空格
+　　         return str.replace(/(^\s*)|(\s*$)/g, "");
+　　     }
+
+</script>
+<section class="w3l-about ">
+<div class="skills-bars pb-5 pt-1">
+    <div class="container pt-md-2">
+        <form method="post">
+        <div class="row mt-1 pt-1">
+            <div class="col-lg-6 col-md-4 col-sm-6 skills-bar-grids mb-2 pb-2">
+                请输入配送中心的地址 :  <input type="text" id="textInput1" placeholder="例：XX市XX区XX路XX号" style="width:50%;border:1px solid #AFAFAF;border-radius:5px;"/>
+            </div>
+            <div class="col-lg-6 col-md-4 col-sm-6 skills-bar-grids mb-2 pb-2">
+                请输入配送车辆的载货量 :  <input type="text" id="textInput4" placeholder="例：200" style="width:50%;border:1px solid #AFAFAF;border-radius:5px;"/>
+            </div>
+            <div class="col-lg-6 col-md-4 col-sm-6 skills-bar-grids mb-2 pb-2">
+                请输入各配送点的地址 :  <input type="text" id="textInput2" placeholder="例：无锡市江南大学 无锡市雪浪中学 无锡职业技术学院 " style="width:50%;border:1px solid #AFAFAF;border-radius:5px;"/>
+            </div>
+            <div class="col-lg-6 col-md-4 col-sm-6 skills-bar-grids mb-2 pb-2">
+                请输入各配送点的配送量 :  <input type="text" id="textInput3" placeholder="例：20 10 40" style="width:50%;border:1px solid #AFAFAF;border-radius:5px;"/>
+            </div>
+            <div class="col-lg-6 col-md-4 col-sm-6 skills-bar-grids mb-4 ">
+            上传文件：<input type="file" id="uploadFile" multiple="multiplt" value="浏览..." onchange="test()" style="position:absolute;left:20%;opacity: 0;
+ z-index: 1;">
+                <label for="uploadFile">
+                <input class="inputButton" type="button" value="选择文件" />
+                </label>
+            </div>
+            <div class="col-lg-6 col-md-4 col-sm-6 skills-bar-grids mb-4 ">
+            <button type="button" class="inputButton" id="startButton2" onclick="onStartButton()">开始计算</button>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+</section>
+
+
+            <p class="my-3 head"> 测试数据：</p>
+            <p class="my-3 head">请输入配送中心的地址：无锡市市民中心</p>
+            <p class="my-3 head">请输入配送车辆的载货量：200 </p>
+            <p class="my-3 head">请输入各配送点的地址：无锡市江南大学 无锡市万科信成花园 无锡市苏锡西路172号 无锡市富力十号c区 无锡太湖新城置业大厦 无锡市海岸城郦园 无锡市苏宁悦城 无锡市东联新村 </p>
+            <p class="my-3 head">请输入各配送点的配送量：78 60 22 37 51 45 19 28</p>
+
+
+<section class="w3l-testimonials" id="testimonials">
+  <div class="customers-6-content py-5">
+    <div class="container py-lg-3">
+      <div class="heading text-center mx-auto">
+        <a name="aboutPosition"/>
+        <h3 class="head">关于我们</h3>
+        <p class="my-3 head "> 关于项目组成人员的简介 </p>
+      </div>
+     
+      <div id="customerhnyCarousel" class="carousel slide" data-ride="carousel">
+
+        <ol class="carousel-indicators">
+          <li data-target="#customerhnyCarousel" data-slide-to="0" class="active"></li>
+                        <li data-target="#customerhnyCarousel" data-slide-to="1"></li>
+                      
+        </ol>
+        <!-- Carousel items -->
+        <div class="carousel-inner pb-5">
+
+          <div class="carousel-item active">
+            <div class="customer row py-5 mt-3">
+              <div class="col-lg-4 col-md-6">
+                <div class="card">
+                 
+                  <div class="card-body">
+                    <img class="card-img-top img-responsive" src="assets/images/c1.jpg" alt="">
+                    <h3 class="card-title mt-2">Chen Zhao</h3>
+                    <p class="sub-title mb-3">赵晨</p>
+                    <p class="card-text">  江南大学物联网学院2018级自动化专业，大三在校学生。</p><br>
+                    <p class="card-text"> 主要负责问题解析和算法构建。</p>
+                    <br>
+                  
+                    
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-6 off-testi-2">
+                <div class="card">
+                
+                  <div class="card-body">
+                    <img class="card-img-top img-responsive" src="assets/images/c2.jpg" alt="">
+                    <h3 class="card-title mt-2">Mengyuan Yu</h3>
+                    <p class="sub-title mb-3">于梦元</p>
+                    <p class="card-text">   江南大学人工智能与计算机学院2018级数字媒体技术专业，大三在校学生。</p>
+                    <p class="card-text">  主要负责网页的制作，包括前端和后台。</p>
+                  
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4 offset-md-3 offset-lg-0 col-md-6 off-testi">
+                <div class="card">
+                  
+                  <div class="card-body">
+                    <img class="card-img-top img-responsive" src="assets/images/c3.jpg" alt="">
+                    <h3 class="card-title mt-2">Tao Yan</h3>
+                    <p class="sub-title mb-3">晏涛</p>
+                    <p class="card-text">  项目指导老师，江南大学人工智能与计算机学院副教授。</p><br>
+                   <p class="card-text"> 研究方向：计算机视觉，3D视觉，光场成像，图像编辑，深度学习。</p>
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--.item-->
+
+          <div class="carousel-item">
+            <div class="customer row py-5 mt-3">
+              <div class="col-lg-4 col-md-6">
+                <div class="card">
+                 
+                  <div class="card-body">
+                    <img class="card-img-top img-responsive" src="assets/images/c2.jpg" alt="">
+                    <h3 class="card-title mt-2">Mark Waugh</h3>
+                    <p class="sub-title mb-3">Engineer</p>
+                    <p class="card-text">  "Neque porro quisquam est, qui dolorem  quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore"
+                    </p>
+                  
+                  
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-6 off-testi-2">
+                <div class="card">
+                 
+                  <div class="card-body">
+                    <img class="card-img-top img-responsive" src="assets/images/c3.jpg" alt="">
+                    <h3 class="card-title mt-2">Sarina Willams</h3>
+                    <p class="sub-title mb-3">Engineer</p>
+                    <p class="card-text">  "Neque porro quisquam est, qui dolorem  quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore"
+                     </p>
+                  
+                    
+                  </div>
+                </div>
+                
+                
+              </div>
+              <div class="col-lg-4 offset-md-3 offset-lg-0 col-md-6 off-testi">
+                <div class="card">
+                 
+                  <div class="card-body">
+                    <img class="card-img-top img-responsive" src="assets/images/c1.jpg" alt="">
+                    <h3 class="card-title mt-2">Henry Nicholas</h3>
+                    <p class="sub-title mb-3">Engineer</p>
+                    <p class="card-text"> "Neque porro quisquam est, qui dolorem  quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore"
+                    </p>
+                   
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+           
+
+        </div>
+        <!--.carousel-inner-->
+      </div>
+    </div>
+  </div>
+  <!--//customers -->
+</section>
+ 
+<section class="w3l-about ">
+<div class="skills-bars pb-5">
+    <div class="container pb-md-5">
+    </div>
+    <div class="container pb-md-4">
+    </div>
+</div>
+</section>
+
+ <!-- grids block 5 -->
+ <section class="w3l-footer-29-main" id="footer">
+  <div class="footer-29 text-center">
+      <div class="container">
+          <p class="copy-footer-29">联系我们</p>
+          <a name="contactPosition"/>
+          <div class="bottom-copies text-center">
+              <p class="copy-footer-29">Tel:15861692318  E-mail:1322014804@qq.com</p>
+               
+          </div>
+      </div>
+  </div>
+   <!-- move top -->
+  <button onclick="topFunction()" id="movetop" title="Go to top">
+    <span class="fa fa-angle-up"></span>
+    </button>
+    <script>
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () {
+            scrollFunction()
+        };
+        function scrollFunction() {
+            if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+             document.getElementById("movetop").style.display = "block";
+            } else {
+              document.getElementById("movetop").style.display = "none";
+            }
+        }
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.body.scrollTop = 0;
+            document.documentElement.scrollTop = 0;
+        }
+     </script>
+     <!-- /move top -->
+</section>
+
+
+
+</body>
+</html>

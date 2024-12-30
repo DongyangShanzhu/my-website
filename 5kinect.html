@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="icon" href="img/favicon.png" type="image/png">
+        <title>Opium Blog</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="vendors/linericon/style.css">
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+        <link rel="stylesheet" href="vendors/owl-carousel/owl.carousel.min.css">
+        <link rel="stylesheet" href="vendors/lightbox/simpleLightbox.css">
+        <link rel="stylesheet" href="vendors/nice-select/css/nice-select.css">
+        <link rel="stylesheet" href="vendors/animate-css/animate.css">
+        <link rel="stylesheet" href="vendors/jquery-ui/jquery-ui.css">
+        <!-- main css -->
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/responsive.css">
+    </head>
+    <body>
+        
+        <!--================Header Menu Area =================-->
+        <header class="header_area">
+			<div class="main_menu">
+				<nav class="navbar navbar-expand-lg navbar-light">
+                    <div class="container box_1620">
+                        <!-- Brand and toggle get grouped for better mobile display -->
+                        <img src="img/MyLogo.png" class ="navbar-brand logo_h"alt="">
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+                            <ul class="nav navbar-nav menu_nav">
+                                <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li> 
+                                <li class="nav-item active"><a class="nav-link" href="#Portfolio">Portfolio</a></li>
+                                <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                            </ul>
+                        </div> 
+                    </div>
+				</nav>
+			</div>
+			<div class="logo_part">
+				<div class="container">
+                    <img src="img/myLogo.png" class="logo" alt="">
+				</div>
+			</div>
+        </header>
+        <!--================Header Menu Area =================-->
+        
+        <!--================Home Banner Area =================-->
+        <section class="banner_area">
+        	<div class="container">
+				<div class="row banner_inner">
+					<div class="col-lg-5"></div>
+					<div class="col-lg-7">
+						<div class="banner_content text-center">
+							<h2>Project Details</h2>
+							<div class="page_link">
+								<a href="index.html">Home</a>
+								<a href="index.html#Portfolio">Portfolio</a>
+							</div>
+						</div>
+					</div>
+				</div>
+        	</div>
+        </section>
+        <!--================End Home Banner Area =================-->
+        
+        <!--================Blog Area =================-->
+        <section class="blog_area p_120 single-post-area">
+            <div class="blog_container">
+                <div class="row">
+                    <div class="col-lg-8">
+       					<div class="main_blog_details">
+                            <h4>kinect体感交互游戏</h4>
+       						<div class="user_details">
+       							<div class="float-left">
+       								<a >kinect</a>
+       								<a >processing</a>
+                                    <a >粒子效果</a>
+       							</div>
+       						</div>
+       						<p>本项目共实现五种不同的效果：</p>
+                            <p>1、粒子填充效果<br/>蓝色粒子填充人体，靠近时粒子散开，远离时粒子汇聚填充人体。识别到无人时，粒子自动铺满整个屏幕。</p>
+                            <div class="blog_container"><img class="img-fluid" src="img/blog/51.png" alt=""></div>
+                            <p>2、赛博朋克效果<br/>栅格化人物形象，渐变色效果完美体现科技感。</p>
+                            <div class="blog_container"><img class="img-fluid" src="img/blog/52.png" alt=""></div>
+       						<p>3、粒子围绕效果<br/>通过深度判断某个粒子是否处于人体轮廓中，若是，则沿该点到人体中心点的方向，移动到人体轮廓的边缘处，已得到粒子围绕人体边缘分布的效果。</p>
+                            <div class="blog_container"><img class="img-fluid" src="img/blog/53.png" alt=""></div>
+							<blockquote class="blockquote">
+								<p class="mb-0">由于判断依据是深度，所以在背景比较杂乱的环境下，该效果会出现识别不准确的现象（该图为在寝室内识别的效果，由于距离近，杂物角度，可以看到除了中间的人形，四周也被判别为人体的深度了）</p>
+							</blockquote>
+                            <p>4、踢沙子效果<br/>该效果通过人体脚部的运动进行控制，为实现双脚控制沙子的效果，整体的沙子由两部分组成：一组沙粒的运动通过左脚进行控制，另一组则通过右脚进行控制。当脚部发生运动时，处在其周围且由该脚进行控制的沙粒，将跟随脚步的运动进行运动。</p>
+                            <div class="blog_container"><img class="img-fluid" src="img/blog/54.png" alt=""></div>
+                            <blockquote class="blockquote">
+                                <p class="mb-0">通过为粒子添加重力和“踢”的作用力，模拟“扬沙子”以及沙子下落的过程。</p>
+                            </blockquote>
+                            <p>5、烟花手部效果<br/>Kinect最多可以跟踪两个骨骼，可以最多检测六个人。站立模式可以跟踪20个关节点，坐着的模式的话，可以跟踪10个关节点。
+                            对于所有获取的骨骼数据，其至少包含以下信息：<br/>
+                            1）、相关骨骼的跟踪状态，被动模式时仅包括位置数据（用户所在位置），主动模式包括完整的骨骼数据（用户20个关节点的空间位置信息）。<br/>
+                            2）、唯一的骨骼跟踪ID，用于分配给视野中的每个用户（和之前说的深度数据中的ID是一个东西，用以区分现在这个骨骼数据是哪个用户的）。<br/>
+                            3）、用户质心位置，该值仅在被动模式下可用（就是标示用户所在位置的）。<br/>
+                            想要通过获取到的人物骨骼点做出更流畅的人物曲线效果，因为人体是有弧度的曲线，而不是直线。在尝试过程中我们使用了B样条、弧线等等曲线，最后确定了效果比较好的贝塞尔曲线。<br/>
+                            手部的动态效果借助粒子系统实现。系统为识别到的每只手添加一个粒子系统，粒子跟随手的位置进行更新和移动，通过粒子的产生、扩散、消失模拟烟花的效果。同时，为左右手设置了不同颜色的烟花效果：左手为蓝色系，右手为红色系。</p>
+                            <div class="blog_container"><img class="img-fluid" src="img/blog/55.png" alt=""></div>
+                            <blockquote class="blockquote">
+                                <p class="mb-0">为仿照真实的烟花效果，为每个粒子初始化向四周扩散的随机速度，同时添加重力加速度。</p>
+                            </blockquote>
+       					</div>
+       					
+                                                                     				
+                        </div>
+                        
+        			</div>
+                </div>
+            </div>
+        </section>
+        <!--================Blog Area =================-->
+        
+        <!--================ start footer Area  =================-->	
+        <footer class="footer-area p_20">
+            <div class="row footer-bottom d-flex justify-content-between align-items-center">
+                <p class="col-lg-12 footer-text text-center"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made  by Yu Mengyuan
+                    <br/>Tel:15861692318  E-mail:1322014804@qq.com
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                </p>
+            </div>
+        </footer>
+		<!--================ End footer Area  =================-->
+        
+        
+        
+        
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script src="js/popper.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/stellar.js"></script>
+        <script src="vendors/lightbox/simpleLightbox.min.js"></script>
+        <script src="vendors/nice-select/js/jquery.nice-select.min.js"></script>
+        <script src="vendors/isotope/imagesloaded.pkgd.min.js"></script>
+        <script src="vendors/isotope/isotope-min.js"></script>
+        <script src="vendors/owl-carousel/owl.carousel.min.js"></script>
+        <script src="vendors/jquery-ui/jquery-ui.js"></script>
+        <script src="js/jquery.ajaxchimp.min.js"></script>
+        <script src="js/mail-script.js"></script>
+        <script src="js/theme.js"></script>
+    </body>
+</html>

@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>人脸识别</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="js/jquery-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery.particleground.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/ccv.js"></script>
+        <script src="js/face.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/styleAI.css" />
+        <script src="js/base.js"></script>
+		<style type="text/css">
+		    .btn_small{
+		    	width: 38%;
+				height: 84%;
+				margin-top:6px;
+				line-height: 38px;
+				display: inline-block;
+				border: 1px solid #009FFD;
+				color: #fff;
+				background: rgba(255,255,255,0.4);
+				border-radius: 4px;
+				cursor: pointer;
+		    }
+			.cent_bg {
+				width: 80%;
+				height: 22em;
+				border: 1px solid rgba(255, 255, 255, 0.5);
+				margin: auto;
+				padding: 3% 6%;
+				border-radius: 10%;
+				font-size: 1.5em;
+				line-height: 2em;
+				position: relative;
+			}
+			
+			.cent {
+				margin-top: 1.5em;
+				overflow-y: auto;
+				height: 80%;
+				text-indent: 2em;
+				text-align: left;
+				padding-right: 0.2em;
+			}
+			
+			
+			::-webkit-scrollbar {
+				width: 10px;
+				background-color: rgba(255,255,255,0.2);
+			}
+			/*定义滚动条轨道 内阴影+圆角*/
+			
+			::-webkit-scrollbar-track {
+				border-radius: 5px;
+				background-color: transparent;
+			}
+			/*定义滑块 内阴影+圆角*/
+			::-webkit-scrollbar-thumb {
+				border-radius: 10px;
+				background-color: rgba(255,255,255,0.7);
+			}
+			
+			.btn{
+				margin-top: 20px;
+				width: 70%;
+				height:130px;
+				transition: 0.4s;
+				border-radius: 1em;
+				border: 1px solid rgba(255, 255, 255, 0.5);
+				border-top:none;
+				z-index: 66;
+				background: rgba(255, 255, 255, 0.2);
+			}
+			.btn:hover{
+				border: 1px solid rgba(255, 255, 255, 0.8) !important;
+				border-top:none !important;
+			}
+			
+			.btn span{
+				width: 38%;
+				height: 80%;
+				margin-top:6px;
+				line-height: 38px;
+				display: inline-block;
+				color: #fff;
+				background: rgba(255,255,255,0.4);
+				border-radius: 4px;
+				cursor: pointer;
+				border: 1px solid white;
+				border-radius: 15px; 
+			}
+			.btn span:hover {
+				transition: 0.5s;
+				background: skyblue;
+			}
+			.btn span:nth-of-type(1){
+				margin-right: 15px;
+				margin-left: 15px;
+			}
+			.btn span:nth-of-type(2){
+				margin-right: 15px;
+				margin-left: 15px;
+			}
+			.btn span:nth-of-type(3){
+				margin-right: 15px;
+				margin-left: 15px;
+			}
+			.btn span:nth-of-type(4){
+				margin-right: 15px;
+				margin-left: 15px;
+			}
+			.img{
+			width: 70%;
+			height: 100%;
+			float: left;
+			position: relative;
+			}
+			.xinxi{
+			width: 30%;
+			height: 100%;
+			float: left;
+			}
+			.biankuang{
+			width: 92%;
+			height: 150%;
+			top: -100px;
+			position: absolute;
+			background: url(img/biankuang.png) no-repeat;
+			background-size: 100% 100%;
+			}
+			.xinxi{
+			text-align: left;
+			}
+			.xinxi span{
+		    margin-top: 40px;
+			}
+			.xinxi span a{
+			color: #FFFFFF;
+			text-decoration: none;
+			}
+			#neirong{
+				color: red;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="adcenter"><script src="http://www.cssmoban.com/include/new/ggad2_728x90.js"></script></div>
+        <div id="large-header" class="large-header">
+					<canvas id="demo-canvas"></canvas> 
+        </div>
+	    <audio controls autoplay>
+        <source id="tts_source" type="audio/mpeg" src="http://tts.baidu.com/text2audio/text2audio?lan=zh&amp;ie=UTF-8&amp;spd=6&amp;text="style="position: absolute;left: 500px;top: 540px;">
+        </audio>
+		<div id="context">
+			<div class="intro">
+				<div class="cent_bg">
+					<div class="img">
+						<div class="biankuang">
+							<div id="elapsed_result" style="margin-top:65px"></div>
+							<img src="img/img111.jpg" id='img' style="width: 83%;height: 55%;position: absolute;left: 49px;top: 150px;"/>
+							<video id="v" style="width: 83%;height: 55%;position: absolute;left: 49px;top: 150px;"></video>
+							<source src="img/img111.jpg" type="video/mp4"></source>
+							<canvas id="canvas" style="width: 83%;height: 55%;position: absolute;left: 49px;top: 150px;"></canvas>
+							<button id='take' disabled style="position: absolute;left: 500px;top: 540px;"onclick="handle()";>拍照</button>
+						</div>
+					</div>
+					<div class="xinxi">
+					<span style="display: block;">姓名：<a href="" id="name"></a></span>
+					<span style="display: block;">性别：<a href="" id="sex"></a></span>
+					<span style="display: block;">年龄：<a href="" id="age"></a><span style="margin-left: 10px;">岁</span></span>				
+					<span style="display: block;">表情：<a href="" id="expression"></a></span>
+					<span style="display: block;">颜值：<a href="" id="beauty"></a></span>
+					<span style="display: block;"><a href="" id="neirong"></a></span>
+					</div>
+					</div>
+					<div class="btn">
+					<form id="renlian" method="post">
+					<span style="position: relative;">上传图片
+					<input type="file" name="image" value="" id="uploading" onchange="test()" style="opacity: 0;width: 100%;position: absolute;height: 100%;display: block;top: 0px;" />
+					</span>
+					<span id="zhuce" onclick="register()">用户注册/更新</span>
+					<span id="jiance">人脸检测</span>
+					<span id="tijiao" onclick="recognize()">开始识别</span>
+				    </form>
+				</div>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script type="text/javascript">
+	var flag=false;
+	var last=0;
+	var form = new FormData();
+    let videoPlaying = false;
+    var mediaStreamTrack=null;
+    let imgdata;
+    let v = document.getElementById('v');
+    var autosubmit=false,handleflag=false;
+    function handle(){
+    	//sleep(2000);
+        let canvas = document.getElementById('canvas');
+        canvas.width = 640;//v.videoWidth;
+        canvas.height = 480; //v.videoHeight;
+        //alert(canvas.width);
+        canvas.getContext('2d').drawImage(v, 0, 0);
+        imgdata = canvas.toDataURL('image/png');
+        flag=true;
+        document.getElementById('img').src=imgdata;
+        document.getElementById('uploading').href=imgdata;
+        detection(canvas);
+        //mediaStreamTrack.stop();
+        document.getElementById('jiance').innerHTML="人脸检测";
+        videoPlaying=false;
+        document.getElementById('take').disabled=true;
+    
+    }
+    window.onload = function init() {
+    	speckText("当前为人脸识别板块,请上传图片或进行人脸检测");
+    }
+    //语音播报
+    function speckText(str){
+    	/*
+        var url = "http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=" + encodeURI(str);        // baidu
+        var n = new Audio(url);
+        n.src = url;
+        n.play();*/
+	    var s = document.getElementById("tts_source");
+	    s.src = "http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=" + str;
+	    s.parentNode.load();
+    }
+    setInterval(function ready() { 
+        //每5秒刷新一次图表
+        if(autosubmit) {
+            autosubmit=false;
+            recognize();
+        }
+        if(handleflag){
+            handleflag=false;
+        	handle();      
+        }
+    }, 1000); 
+    //检测是否有人脸
+    function detection(image) {
+    	document.getElementById("elapsed_result").innerHTML="初步检测中...";
+    	var ctx = image.getContext("2d");
+        var comp = ccv.detect_objects({
+            "canvas": ccv.grayscale(ccv.pre(image)),
+            "cascade": cascade,
+            "interval": 5,
+            "min_neighbors": 1
+        });
+        document.getElementById("elapsed_result").innerHTML = "初步检测结果: " + (comp.length ? '检测到'+comp.length+'个人脸': "未监测到人脸");
+         ctx.lineWidth = 3;
+         ctx.strokeStyle = "#f00";
+        for (var i = 0; i < comp.length; i++){
+            ctx.strokeRect(comp[i].x, comp[i].y, comp[i].width, comp[i].height);
+        }
+        if(comp.length==0&&last==2) {
+		    document.getElementById('canvas').width=0;
+		    document.getElementById('canvas').height=0;
+        	handleflag=true;
+        }
+        else if(comp.length!=0) autosubmit=true;
+    }
+    //判断图片是否正确上传
+	function test() {
+		//document.getElementById('canvas').style.display = "none";
+		document.getElementById('canvas').width=0;
+		document.getElementById('canvas').height=0;
+		var file = document.getElementById("uploading").files[0];
+		var fr = new FileReader;
+		var filePath = document.querySelector("#uploading").value;
+		fileFormat = filePath.substring(filePath.lastIndexOf(".")).toLowerCase();
+		if(!fileFormat.match(/.png|.jpg|.jpeg/)) {
+			speckText("文件格式错误");
+			//alert('上传错误,文件格式必须为：png/jpg/jpeg');
+			return;
+		} else {
+			fr.readAsDataURL(file);
+			fr.onload = function(e) {
+				document.getElementById("img").src = this.result;
+				imgdata=this.result;
+				flag=true;
+				var c=document.getElementById("canvas");
+                var i=document.getElementById("img");
+                i.width=640;i.height=480;
+                c.width = 640;//v.videoWidth;
+                c.height = 480; //v.videoHeight;
+                //var ww=document.body.clientWidth*0.83;
+                //alert(ww);
+                c.getContext('2d').drawImage(i, 0, 0,640,480);
+                last=1;
+				detection(c);
+			}
+		}
+	}
+	function recognize(){
+		if(flag){
+			var form = new FormData();
+            form.append('image',imgdata);
+            document.getElementById("elapsed_result").innerHTML = "识别中...";
+        speckText("人脸识别中");
+		$.ajax({
+			type: "post",
+			url: basePath + "/FaceDetect",
+			dataType: "json",
+			data: form,//{"text":text,"image": imgdata}, //new FormData($('#renlian')[0]) ,
+			processData: false,
+			contentType: false,
+			beforeSend: function() {
+				uploading = true;
+			},
+			success: function(res) {
+				if(res.status=="200"){
+					$("#neirong").text("");
+					$("#name").text(res.data.name);
+					$("#sex").text(res.data.gender);
+					$("#age").text(res.data.age);
+					$("#expression").text(res.data.expression);
+					$("#beauty").text(res.data.beauty);
+					if(res.data.flag==0){
+						//用户不存在
+						speckText("警告：该用户不存在,可进行用户注册");
+						//alert('警告：该用户不存在！可进行用户注册');
+						document.getElementById("elapsed_result").innerHTML = "识别成功，该用户不存在";
+					}
+					else {
+						speckText("识别成功，该用户为"+res.data.name);
+						document.getElementById("elapsed_result").innerHTML = "识别成功，该用户为"+res.data.name;
+					}
+				}else{
+					speckText("无法识别");
+					//alert('无法识别');
+				}
+			},
+			error(xhr,status,error){
+				document.getElementById("elapsed_result").innerHTML = "后台服务异常";
+				alert('后台服务异常');
+				return;
+			}
+		})}
+		else speckText("请先上传图片或者进行人脸检测！");//alert('请先上传图片或者进行人脸检测！');
+	}
+	function register(){
+		//用户注册
+		window.location.href="face_register.html";
+	}
+	$("#jiance").click(function() {
+		if(videoPlaying)
+		{
+			videoPlaying=false;
+			mediaStreamTrack.stop();
+			document.getElementById('jiance').innerHTML="人脸检测";
+			//document.getElementById('take').disabled=true;
+		}
+		else {
+            document.getElementById('jiance').innerHTML="停止检测";
+           // document.getElementById('take').removeAttribute('disabled');
+            last=2;
+			auto();
+		}
+	});
+	function auto(){
+		//自动拍照检测
+		document.getElementById('canvas').width=0;
+		document.getElementById('canvas').height=0;
+		// 老的浏览器可能根本没有实现 mediaDevices，所以我们可以先设置一个空的对象
+        if (navigator.mediaDevices === undefined) {
+            navigator.mediaDevices = {};
+        }
+        if (navigator.mediaDevices.getUserMedia === undefined) {
+            navigator.mediaDevices.getUserMedia = function (constraints) {
+                // 首先，如果有getUserMedia的话，就获得它
+                var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+
+                // 一些浏览器根本没实现它 - 那么就返回一个error到promise的reject来保持一个统一的接口
+                if (!getUserMedia) {
+                    return Promise.reject(new Error('getUserMedia is not implemented in this browser'));
+                }
+
+            // 否则，为老的navigator.getUserMedia方法包裹一个Promise
+                return new Promise(function (resolve, reject) {
+                getUserMedia.call(navigator, constraints, resolve, reject);
+                });
+            }
+        }
+
+        const constraints = {video: true,audio: false};
+        let promise = navigator.mediaDevices.getUserMedia(constraints);
+        promise.then(stream => {
+        // 旧的浏览器可能没有srcObject
+            if ("srcObject" in v) 
+            	v.srcObject = stream;
+            else 
+            // 防止再新的浏览器里使用它，应为它已经不再支持了
+            v.src = window.URL.createObjectURL(stream);
+            v.onloadedmetadata = function (e) {
+            	v.play();
+                videoPlaying = true;
+            };
+            mediaStreamTrack=stream.getTracks()[0];
+        }).catch(err => {
+            console.error(err.name + ": " + err.message);
+        })
+        handleflag=true;
+        //handle();
+        /*
+        document.getElementById('take').addEventListener('click', function () {
+            if (videoPlaying) {
+                let canvas = document.getElementById('canvas');
+                canvas.width = 640;//v.videoWidth;
+                canvas.height = 480; //v.videoHeight;
+                //alert(canvas.width);
+                canvas.getContext('2d').drawImage(v, 0, 0);
+                imgdata = canvas.toDataURL('image/png');
+                flag=true;
+                document.getElementById('img').src=imgdata;
+                document.getElementById('uploading').href=imgdata;
+                detection(canvas);
+                mediaStreamTrack.stop();
+		        document.getElementById('jiance').innerHTML="人脸检测";
+		        videoPlaying=false;
+		        document.getElementById('take').disabled=true;
+            }
+        }, false);*/
+    }
+</script>
+
+<script src="js/TweenLite.min.js"></script>
+<script src="js/EasePack.min.js"></script>
+<script src="js/rAF.js"></script>
+<script src="js/demo-1.js"></script> 
+
+<script>
+    /*
+    //随机粒子背景 没用上，删除前面四个script就用上了
+    $(document).ready(function() {
+        $('#context').particleground({
+            dotColor: '#5cbdaa',
+            lineColor: '#5cbdaa'
+    });
+    */
+    //位置偏移控制
+	$('.intro').css({
+	    'margin-top': -($('.intro').height() / 2)
+    });
+</script>>

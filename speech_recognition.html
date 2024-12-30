@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>语音识别</title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<script src="js/jquery-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+        <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+		<script src="js/jquery.particleground.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="https://cdn.bootcss.com/qiniu-js/1.0.17.1/qiniu.min.js"></script>
+        <script src="https://cdn.bootcss.com/plupload/2.1.1/moxie.js"></script>
+        <script src="https://cdn.bootcss.com/plupload/2.1.1/plupload.min.js"></script>
+        <script src="js/recorder.js"></script>
+        <script src="js/base.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/styleAI.css" />
+		<style type="text/css">
+			
+			.cent_bg {
+				width: 80%;
+				height: 22em;
+				border: 1px solid rgba(255, 255, 255, 0.5);
+				margin: auto;
+				padding: 3% 6%;
+				border-radius: 10%;
+				font-size: 1.5em;
+				line-height: 2em;
+				position: relative;
+			}
+			
+			.cent {
+				margin-top: 1.5em;
+				overflow-y: auto;
+				height: 80%;
+				text-indent: 2em;
+				text-align: left;
+				padding-right: 0.2em;
+			}
+			
+			::-webkit-scrollbar {
+				width: 10px;
+				background-color: rgba(255, 255, 255, 0.2);
+			}
+			/*定义滚动条轨道 内阴影+圆角*/
+			
+			::-webkit-scrollbar-track {
+				border-radius: 5px;
+				background-color: transparent;
+			}
+			/*定义滑块 内阴影+圆角*/
+			
+			::-webkit-scrollbar-thumb {
+				border-radius: 10px;
+				background-color: rgba(255, 255, 255, 0.7);
+			}
+			#ttttt{
+				display: none;
+			}
+			
+			.btn {
+				margin-top: 20px;
+				width: 70%;
+				height: 80px;
+				transition: 0.4s;
+				border-radius: 1em;
+				border: 1px solid rgba(255, 255, 255, 0.5);
+				border-top: none;
+				z-index: 66;
+				overflow: hidden;
+				position: relative;
+				background: rgba(255, 255, 255, 0.2);
+			}
+			
+			.btn:hover {
+				border: 1px solid rgba(255, 255, 255, 0.8) !important;
+				border-top: none !important;
+			}
+			
+			.btn span {
+				width: 30%;
+				height: 84%;
+				margin-top: 6px;
+				line-height: 38px;
+				display: inline-block;
+				color: #fff;
+				background: rgba(255, 255, 255, 0.4);
+				border-radius: 4px;
+				cursor: pointer;
+				border: 1px solid white;
+				border-radius: 15px; 
+				margin: auto;
+			}
+			.btn span:hover{
+				
+				transition: 0.5s;
+				background: skyblue;
+			}
+			.btn span:nth-of-type(1) {
+				margin-right: 15px;
+				position: relative;
+			}
+			
+			.btn span:nth-of-type(3) {
+				margin-left: 15px;
+			}
+			input{
+				width: 100%;
+				height: 100%;
+				border: 1px solid red;
+				position: absolute;
+				top: 0;
+				left: 0;
+				opacity: 0;
+			}
+			.img{
+				width: 60px;
+				height: 60px;
+				margin: auto;
+				text-align: center;
+				position: relative;
+			}
+			.img img{
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+			.mmm{
+				width: 100%;
+				height: 100%;
+				position: absolute;
+				top: 0;
+				left: 0;
+				z-index: 999;
+				display: none;
+				cursor: pointer;
+				background: #b9fff4;
+				color: aqua;
+				line-height: 80px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="adcenter"><script src="http://www.cssmoban.com/include/new/ggad2_728x90.js"></script></div>
+        <div id="large-header" class="large-header">
+					<canvas id="demo-canvas"></canvas> 
+        </div>
+	    <audio controls autoplay>
+        <source id="tts_source" type="audio/mpeg" src="http://tts.baidu.com/text2audio/text2audio?lan=zh&amp;ie=UTF-8&amp;spd=6&amp;text="style="position: absolute;left: 500px;top: 540px;">
+        </audio>
+		<div id="context">
+			<div class="intro">
+				<div class="cent_bg">
+					<h3>语音识别内容：</h3>
+					<ul id="recordingslist"></ul>
+					<div class="cent" id="cent">
+					</div>
+				</div>
+				<div class="btn">
+					<span>上传文件(.wav/.mp3/.pcm)
+					</span>
+					<span id="record">录音
+					</span>
+					<span>开始识别</span>
+					<div class="mmm">
+						正在识别...
+					</div>
+				</div>
+				<form id="ttttt" action="" method="post">
+					<input type="file" name="voice" value="" onchange="upload()">
+				</form>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script type="text/javascript">
+var audio_context;
+var recorder;
+var name;
+var startflag=false;
+var fileflag=false;
+var formData ;
+function startUserMedia(stream) {
+    var input = audio_context.createMediaStreamSource(stream);
+    var config = {
+      sampleRate: 16000,
+      sampleRate: 16000,
+      bitRate: 16,
+      mimeType: 'audio/mp3'
+    };
+    recorder = new Recorder(input,config);
+}
+function upload(){
+    name=document.querySelector("input").value;
+    $(".cent").html("已选择文件:"+name);
+    formData=new FormData($('#ttttt')[0]);
+    fileflag=true;
+	recordingslist.innerHTML="";
+	/*
+		$(".mmm").css("display","block");
+		$(".cent").html('<div class="img"><img src="images/timg.gif"/></div>');
+		$.ajax({
+			url: basePath + "/VoiceRecognize",
+			type: 'post',
+			cache: false,
+			data: formData,//new FormData($('#ttttt')[0]),
+			processData: false,
+			contentType: false,
+			dataType: "json",
+			beforeSend: function() {
+				uploading = true;
+			},
+			success: function(data) {
+				if (data.status=="200") {
+					$(".cent").html(data.data.text);
+					$(".mmm").css("display","none");
+				} else{
+					$(".cent").html("未能识别 "+data.msg);
+					$(".mmm").css("display","none");
+				}
+			}
+		});
+		*/
+}
+//语音播报
+function speckText(str){
+    var s = document.getElementById("tts_source");
+    s.src = "http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=" + str;
+    s.parentNode.load();
+}
+window.onload = function init() {
+	speckText("当前为语音识别板块,请上传语音文件或进行录音");
+    try {
+      // webkit shim
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia ;
+      window.URL = window.URL || window.webkitURL;
+      
+      audio_context = new AudioContext;
+      //__log('请设置Audio context .');
+      //__log('navigator.getUserMedia ' + (navigator.getUserMedia ? '支持.' : '不支持！'));
+    } catch (e) {
+      alert('当前浏览器不支持音频功能');
+    }
+    navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(startUserMedia)
+    .catch(errorHandler)
+};
+function createDownloadLink() {
+    recorder && recorder.exportAudio(function(blob) {
+    var url = URL.createObjectURL(blob);
+    formData = new FormData();
+    formData.append("voice", blob);
+    fileflag=true;
+    $.ajax({
+	    url: 'http://api.shudong.wang/v1/file/upload-file', // 存储音频接口
+	    type: 'POST',
+	    data: formData,
+	    // 告诉jQuery不要去处理发送的数据
+	    processData: false,
+	    // 告诉jQuery不要去设置Content-Type请求头
+	    contentType: false,
+	    beforeSend: function () {
+	      console.log("正在进行，请稍候");
+	    },
+	    success: function (responseStr) {
+	      if (responseStr.status === 0) {
+	        console.log("成功" + responseStr);
+	      } else {
+	        console.log("失败");
+	      }
+	    },
+	    error: function (responseStr) {
+	      console.log("error");
+        }
+    });
+    var li = document.createElement('li');
+    var au = document.createElement('audio');
+    var hf = document.createElement('a');
+    au.controls = true;
+    au.src = url;
+    hf.href = url;
+    hf.download = new Date().toISOString() + '.mp3';
+    hf.innerHTML = hf.download;
+    //li.appendChild(hf);
+    li.appendChild(au);
+    recordingslist.appendChild(li);
+});
+}
+
+function errorHandler(params) {
+
+}
+
+$(function() {
+	$(".btn span:nth-of-type(1)").click(function() {
+		$('#ttttt input[name="voice"]').click();
+	})
+	$(".btn span:nth-of-type(2)").click(function() {
+	    recordingslist.innerHTML="";	
+        $(".cent").html("");
+	    if(startflag){
+	        recorder && recorder.stop();
+	        startflag=false;
+	        document.getElementById("record").innerHTML = "开始录音";
+	        createDownloadLink();
+	        recorder && recorder.clear();
+	    }
+	    else{
+	        $(".cent").html("...正在录音...");
+	        recorder && recorder.record();
+	        startflag=true;
+	        document.getElementById("record").innerHTML = "停止录音";
+	    }
+    })
+	$(".btn span:nth-of-type(3)").click(function() {
+		if(fileflag==false){
+			speckText("未选择文件");
+			//alert("未选择文件");
+			return ;
+		}
+		$(".mmm").css("display","block");
+		$(".cent").html('<div class="img"><img src="images/timg.gif"/></div>');
+		speckText("开始识别");
+		$.ajax({
+			url: basePath + "/VoiceRecognize",
+			type: 'post',
+			cache: false,
+			data: formData,//new FormData($('#ttttt')[0]),
+			processData: false,
+			contentType: false,
+			dataType: "json",
+			beforeSend: function() {
+				uploading = true;
+			},
+			success: function(data) {
+				if (data.status=="200") {
+					$(".cent").html(data.data.text);
+					$(".mmm").css("display","none");
+					if(data.data.type=="1"){
+						alert("正在跳转到人脸识别界面...");
+						window.location.href="face_recognition.html";
+					}
+					else if(data.data.type=="2"){
+						alert("正在跳转到用户注册界面...");
+						window.location.href="face_register.html";
+					}
+					else if(data.data.type=="3"){
+						alert("正在跳转到人脸比对界面...");
+						window.location.href="face_match.html";
+					}
+					else if(data.data.type=="4"){
+						alert("正在跳转到语音合成界面...");
+						window.location.href="speech_produce.html";
+					}
+				} else{
+					speckText("未能识别 "+data.msg);
+					$(".cent").html("未能识别 "+data.msg);
+					$(".mmm").css("display","none");
+				}
+			}
+		});
+	});
+});
+</script>
+
+<script src="js/TweenLite.min.js"></script>
+<script src="js/EasePack.min.js"></script>
+<script src="js/rAF.js"></script>
+<script src="js/demo-1.js"></script> 
+
+<script>
+    /*
+    //随机粒子背景 没用上，删除前面四个script就用上了
+    $(document).ready(function() {
+        $('#context').particleground({
+            dotColor: '#5cbdaa',
+            lineColor: '#5cbdaa'
+    });
+    */
+    //位置偏移控制
+	$('.intro').css({
+	    'margin-top': -($('.intro').height() / 2)
+    });
+</script>>

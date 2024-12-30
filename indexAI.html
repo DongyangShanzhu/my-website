@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>人工智能 未来已来</title>
+		<link rel="stylesheet" href="css/button.min.css" />
+		<link rel="stylesheet" href="css/styleAI.css" />
+		<script type='text/javascript' src='js/jquery-1.11.1.min.js'></script>
+		<script type='text/javascript' src='js/jquery.particleground.min.js'></script>
+        <script src="js/base.js"></script>
+	</head>
+	<body>
+		<div class="adcenter"><script src="http://www.cssmoban.com/include/new/ggad2_728x90.js"></script></div>
+        <div id="large-header" class="large-header">
+					<canvas id="demo-canvas"></canvas> 
+        </div>
+	    <audio controls autoplay>
+        <source id="tts_source" type="audio/mpeg" src="http://tts.baidu.com/text2audio/text2audio?lan=zh&amp;ie=UTF-8&amp;spd=6&amp;text="style="position: absolute;left: 500px;top: 540px;">
+        </audio>
+        
+		<div id="context">
+			<div class="intro">
+					<div class="position">
+                        <h1>人工智能 未来已来</h1>
+						<!--start button, nothing above this is necessary -->
+						<div class="svg-wrapper">
+							<svg height="140" width="450" xmlns="http://www.w3.org/2000/svg">
+								<rect id="shape" height="140" width="300" />
+								<div id="text">
+									<a href="face_recognition.html"><span class="spot"></span>人脸检测</a>
+								</div>
+							</svg>
+						</div>
+						<div class="svg-wrapper">
+							<svg height="140" width="450" xmlns="http://www.w3.org/2000/svg">
+								<rect id="shape" height="140" width="300" />
+								<div id="text">
+									<a href="face_match.html"><span class="spot"></span>人脸比对</a>
+								</div>
+							</svg>
+						</div>
+						<!--Next button -->
+						<div class="svg-wrapper">
+							<svg height="140" width="450" xmlns="http://www.w3.org/2000/svg">
+								<rect id="shape" height="140" width="300" />
+								<div id="text">
+									<a href="speech_recognition.html"><span class="spot"></span>语音识别</a>
+								</div>
+							</svg>
+						</div>
+						<!--Next button -->
+						<div class="svg-wrapper">
+							<svg height="140" width="450" xmlns="http://www.w3.org/2000/svg">
+								<rect id="shape" height="140" width="300" />
+								<div id="text">
+									<a href="speech_produce.html"><span class="spot"></span>语音合成</a>
+								</div>
+							</svg>
+						</div>
+						<!--End button -->
+					</div>
+				</div>
+		</div>
+	</body>
+</html>
+
+
+<script src="js/TweenLite.min.js"></script>
+<script src="js/EasePack.min.js"></script>
+<script src="js/rAF.js"></script>
+<script src="js/demo-1.js"></script> 
+<script>
+	window.onload = function init() {
+    	speckText("人工智能,未来已来");
+    }
+    //语音播报
+    function speckText(str){
+    	
+	    var s = document.getElementById("tts_source");
+	    s.src = "http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=" + str;
+	    s.parentNode.load();
+    }
+    /*
+    //随机粒子背景 没用上，删除前面四个script就用上了
+    $(document).ready(function() {
+        $('#context').particleground({
+            dotColor: '#5cbdaa',
+            lineColor: '#5cbdaa'
+    });
+    */
+    //位置偏移控制
+	$('.intro').css({
+	    'margin-top': -($('.intro').height() / 2)
+    });
+</script>>

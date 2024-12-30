@@ -1,0 +1,87 @@
+* {
+	margin: 0;
+	padding: 0
+}
+
+html,
+css {
+	width: 100%;
+	height: 100%
+}
+
+.position {
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+	margin-top: 0%
+}
+
+/*#workarea {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: #1e1a3e;
+	font-family: Raleway
+}*/
+
+#personal {
+	color: white;
+	text-decoration: none;
+	position: absolute;
+	bottom: 15px;
+	right: 2%
+}
+
+.spot {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0
+}
+
+.svg-wrapper {
+	margin-top: 0;
+	position: relative;
+	width: 300px;
+	height: 140px!important;
+	display: inline-block;
+	border-radius: 3px;
+	margin-left: 5px;
+	margin-right: 5px;
+	border: 1px solid floralwhite!important;
+	margin-top: 50px;
+}
+
+#shape {
+	stroke-width: 6px;
+	fill: transparent;
+	/*stroke: #009FFD;*/
+	stroke-dasharray: 185 800;
+	stroke-dashoffset: -200;
+	transition: 1s all ease
+}
+
+
+
+.svg-wrapper:hover #shape {
+	stroke-dasharray: 50 0;
+	stroke-width: 2px;
+	stroke-dashoffset: 0;
+	stroke: #06D6A0
+}
+#text{
+	position: absolute;
+	top: 0%;
+	left: 0%;
+}
+a{
+	color: white;
+	text-decoration: none;
+	font-size: 1.7em!important;
+	display: inline-block;
+	width: 300px;
+	height: 140px;
+	line-height: 140px!important;
+	/*border: 1px solid red!important;*/
+}

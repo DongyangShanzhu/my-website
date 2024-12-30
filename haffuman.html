@@ -1,0 +1,752 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>Adaptive Huffman</title>
+<meta charset="UTF-8">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gojs/1.6.7/go-debug.js"></script> <!--GOJS library-->
+<style type="text/css">
+html 
+{
+   font-size: 16px !important;
+   color: #000;
+   font-family: Consolas !important;
+}
+
+mark
+{
+	background: #000; 
+	color: #FFF;
+}
+</style>
+<script id="code">
+	var l;
+  NYTKey = 0;
+	RootKey = 0;
+	lastModifiedNode = null;
+	codeList = [];
+	charsInTree = [];//树
+	codeBook = {};
+	original = "";//原始输入值
+	encoded = "0 ";//编码结果
+	var type = 0;//1为编码。2为解码
+	var num = 0;
+	var codeForm = {
+      name:Array(),
+      code:Array(),
+   };
+  var string="";
+  var firstNEW=true;
+  function init() {	
+
+  var $ = go.GraphObject.make;
+
+  myDiagram =
+    $(go.Diagram, "myDiagramDiv",
+      {
+        initialAutoScale: go.Diagram.UniformToFill,
+			  allowDrop: false,
+			  allowMove: false,
+			  allowCopy: false,
+			  allowSelect: false,
+        layout: $(go.TreeLayout,
+				{ comparer: myComparer })
+      });
+
+
+  myDiagram.nodeTemplate =
+	$(go.Node, "Auto",
+		$(go.Shape, "Rectangle",
+		{ fill: "white", strokeWidth: 3 },
+		new go.Binding("stroke", "changed", function (k) {
+			return (k? "#0288D1" : "#000000" ); 
+		})),
+
+      $(go.Panel, "Table",
+        { padding: 0.5 },
+	  $(go.RowColumnDefinition, { column: 0, separatorStroke: "black" }),
+        $(go.RowColumnDefinition, { column: 1 }),
+        $(go.RowColumnDefinition, { column: 2, separatorStroke: "black", separatorStrokeWidth:3 }),
+	  $(go.RowColumnDefinition, { column: 3 }),
+        $(go.RowColumnDefinition,
+		new go.Binding("background", "character", function (c) {
+			return (c == ""? "#000000" : "#FFFFFF" ); 
+		}),
+	  { row: 0, separatorStroke: "black", background: "white", coversSeparators: true, height: 20 }),
+        $(go.RowColumnDefinition, { row: 1, separatorStroke: "black", height: 20 }),
+	  
+	  $(go.TextBlock, 
+          new go.Binding("text", "character"),
+          { row: 0, column: 0, columnSpan: 300, margin: 0,
+            textAlign: "center", font: "bold 14px sans-serif" }),
+
+        $(go.TextBlock, "W:",
+          { row: 1, column: 0, margin: 5, textAlign: "center" }),
+        $(go.TextBlock,
+          new go.Binding("text", "weight"),
+          { row: 1, column: 1, margin: 5, textAlign: "left" }),
+        $(go.TextBlock, "N:",
+          { row: 1, column: 2, margin: 5, textAlign: "center" }),
+		$(go.TextBlock,
+          new go.Binding("text", "key"),
+          { row: 1, column: 3, margin: 5, textAlign: "left" })
+      )
+    );
+
+
+  myDiagram.linkTemplate =
+    $(go.Link,
+      { routing: go.Link.Normal,
+        selectable: false },
+      $(go.Shape,
+        { strokeWidth: 3, stroke: "#000" }));
+
+resetForm();
+layout();
+}
+
+function resetForm(){
+
+	NYTKey = 0;
+	RootKey = 0;
+	lastModifiedNode = null;
+	//lastEncodedCharacter = "";
+	codeList = [];
+	charsInTree = [];
+	codeBook = {};
+	original = "";
+	string = "";
+	encoded = "";
+	num=0;
+  firstNEW=true;
+	document.getElementById("resultSpan").innerHTML="";
+
+	var codesDiv = document.getElementById("codesDiv");
+	codesDiv.innerHTML = "";
+
+	var input = document.getElementById("textInput");
+	input.disabled = false;
+	input.style.visibility = "visible";
+	input.value = "";
+
+	var input2 = document.getElementById("textInput2");
+	input2.disabled = false;
+	input2.style.visibility = "visible";
+	input2.value = "";
+
+  var input3 = document.getElementById("textInput3");
+	input3.disabled = false;
+	input3.style.visibility = "visible";
+
+
+	///
+	input3.value = "[A]00001[B]00010[C]00011[D]00100";
+////
+
+	var buttons = document.getElementsByClassName("stepButton");
+	for(b of buttons){
+		b.style.visibility = "hidden";
+	}
+	
+	var inputSpan = document.getElementById("inputSpan");
+	inputSpan.style.visibility = "visible";
+	
+	var startButton = document.getElementById("startButton");
+	startButton.style.visibility = "visible";
+
+	var startButton2 = document.getElementById("startButton2");
+	startButton2.style.visibility = "visible";
+	
+	var resetButton = document.getElementById("resetButton");
+	resetButton.style.visibility = "hidden";
+	
+	//updateCodes();
+	//displayCodes();
+}
+function layout() {
+	myDiagram.startTransaction("change Layout");
+	var lay = myDiagram.layout;
+
+	lay.treeStyle = go.TreeLayout.StyleLayered;
+	lay.layerStyle = go.TreeLayout.LayerIndividual;
+	lay.angle = 90;
+	lay.alignment = go.TreeLayout.AlignmentCenterChildren;
+	lay.arrangement = go.TreeLayout.ArrangementFixedRoots;
+	lay.nodeSpacing = 20;
+	lay.nodeIndent = 0;
+	lay.nodeIndentPastParent = 0;
+	lay.layerSpacing = 50;
+	lay.layerSpacingParentOverlap = 0;
+	lay.sorting = go.TreeLayout.SortingAscending;
+	lay.compaction = go.TreeLayout.CompactionBlock;
+	lay.breadthLimit = 0;
+	lay.rowSpacing = 25;
+	lay.rowIndent = 10;
+	lay.setsPortSpot = true;
+	lay.setsChildPortSpot = true;
+
+	myDiagram.commitTransaction("change Layout");
+}
+function myComparer(m,n){
+
+if (m.node.data.key > n.node.data.key)
+	return 1;
+else if (m.node.data.key < n.node.data.key)
+	return -1;
+else return 0;
+}
+
+//解码开始函数
+function generateEmptyGraph(){
+var nodeArray = [];
+
+var input = document.getElementById("textInput").value;
+var uniqChars = countUniqChars(input);
+
+var n = uniqChars * 2 + 1;
+
+nodeArray.push({
+      key: n,
+	weight: 0,
+	character: "NEW",
+	changed: true
+})
+
+NYTKey = n;
+RootKey = n;
+charsInTree.push("NEW");
+
+myDiagram.model = new go.TreeModel(nodeArray);
+
+updateCodes();
+displayCodes();
+}
+
+function shortStep(){
+	if (!lastModifiedNode){	
+		//区分编码和解码
+		//提取字符串第一个字符
+		if(type==1){
+		  var inputText = document.getElementById("textInput");
+		  if (inputText.value === ""){
+			  return;	
+		  }
+		  var firstChar = inputText.value.substring(0,1);	
+		  if (firstChar == " "){	
+			  firstChar = "_space_"; 
+		  }
+			
+		  inputText.value = inputText.value.substring(1);	
+
+			lastModifiedNode = processCharacter(firstChar);	
+			markAsChanged(lastModifiedNode);	
+			layout();
+
+		}
+		else
+		{
+			var inputText = document.getElementById("textInput2");
+			if(inputText.value === "") return;
+      var firstChar;
+      var tmp="";
+      var newFlag=false;//用于标识是否是新字母
+      for(var i=0;i<l;i++){
+        tmp= inputText.value.substring(0,i+1);	
+      	if(tmp==codeBook["NEW"]){
+      		newFlag=true;
+			    original += tmp;
+			    tmp="";
+			    inputText.value = inputText.value.substring(i+1);
+			    break;
+      	}
+			}
+			var j=0;
+			if(newFlag) j=l;
+			while(j<inputText.value.length){
+				j=j+1;
+      	if(inputText.value === "") break;
+        tmp = inputText.value.substring(0,j);
+      	for(var i=0;i<num;i++){
+      		if(tmp==codeBook[codeForm.name[i]]){
+      			firstChar=codeForm.name[i];
+      			string+=firstChar;
+      			original += tmp;
+      			if(newFlag){
+      				charsInTree.push(firstChar);
+			        lastModifiedNode=addNewEntry(firstChar);
+			        markAsChanged(lastModifiedNode);	
+			        layout();      			
+			      }
+      			else{
+      			  var node = getNodeByProperty("character", firstChar);
+      				updateNode(node);
+      				lastModifiedNode=node;
+			        markAsChanged(lastModifiedNode);	
+			        layout();
+      			}
+			      inputText.value = inputText.value.substring(j);	
+      			return;
+      		}
+      	}
+      }
+			alert('无法解码！');
+			encodingFinished();
+		}
+	}
+	else{	
+	  //进行交换操作，不会得新字符
+		lastModifiedNode = getNodeByProperty("key", lastModifiedNode.parent);	
+		updateNode(lastModifiedNode);	
+		markAsChanged(lastModifiedNode);	
+		layout();
+		
+		if (!lastModifiedNode["parent"]){	
+			
+			lastModifiedNode = null;
+			updateCodes();					
+			displayCodes();
+			var inputText;
+			if(type==1) inputText = document.getElementById("textInput");
+			else inputText = document.getElementById("textInput2");
+			if(inputText.value == ""){	
+				encodingFinished();
+			}
+		}
+	}
+}
+	
+	function longStep(){
+		if (lastModifiedNode){		
+			while(lastModifiedNode){
+				shortStep();		
+			}
+			return;
+		}
+	  var inputText;
+		if(type==1) {
+			inputText = document.getElementById("textInput");
+
+			var firstChar = inputText.value.substring(0,1);
+			inputText.value = inputText.value.substring(1);
+			if (firstChar == " ")
+				firstChar = "_space_"
+			var modifiedNode = processCharacter(firstChar);
+			
+			markAsChanged(modifiedNode);
+			
+			do{
+				modifiedNode = getNodeByProperty("key", modifiedNode.parent);
+				updateNode(modifiedNode);
+			}while(modifiedNode["parent"])
+			
+			updateCodes();
+			displayCodes();
+			
+			if(inputText.value == ""){
+				encodingFinished();
+			}
+		}
+		else{
+			var modifiedNode;
+			inputText = document.getElementById("textInput2");
+			if(inputText.value === "") return;
+      var firstChar;
+      var tmp="";
+      var newFlag=false;//用于标识是否是新字母
+      for(var i=0;i<l;i++){
+        tmp= inputText.value.substring(0,i+1);	
+      	if(tmp==codeBook["NEW"]){
+      		newFlag=true;
+			    original += tmp;
+			    tmp="";
+			    inputText.value = inputText.value.substring(i+1);
+			    break;
+      	}
+			}
+			var j=0;
+			if(newFlag) j=l;
+			var flag=false;
+			while(j<inputText.value.length){
+				j=j+1;
+      	if(inputText.value === "") break;
+        tmp = inputText.value.substring(0,j);
+      	for(var i=0;i<num;i++){
+      		if(tmp==codeBook[codeForm.name[i]]){
+      			flag=true;
+      			firstChar=codeForm.name[i];
+      			string+=firstChar;
+      			original += tmp;
+      			if(newFlag){
+      				charsInTree.push(firstChar);
+      				modifiedNode=addNewEntry(firstChar);
+			      }
+      			else{
+      			  var node = getNodeByProperty("character", firstChar);
+      				updateNode(node);
+      				modifiedNode=node;
+      			}
+			      inputText.value = inputText.value.substring(j);	
+			      break;
+      		}
+      	}
+      	if(flag) break;
+      }
+      if(flag){
+	      markAsChanged(modifiedNode);
+				
+				do{
+					modifiedNode = getNodeByProperty("key", modifiedNode.parent);
+					updateNode(modifiedNode);
+				}while(modifiedNode["parent"])
+				
+				updateCodes();
+				displayCodes();
+				
+				if(inputText.value == ""){
+					encodingFinished();
+				}
+			}
+			else{
+				alert('无法解码！');
+				encodingFinished();
+			}
+		}
+	}
+	
+	function markAsChanged(node){
+		for (n of myDiagram.model.nodeDataArray){
+			myDiagram.model.setDataProperty(n, "changed", false);
+		}
+		myDiagram.model.setDataProperty(node, "changed", true);
+	}
+	
+	function updateCodes(){
+		
+		for(c of charsInTree){
+			var code = "";
+			var node = getNodeByProperty("character", c);
+			do{
+				var sibling = getSibling(node);
+				if(sibling){
+					if(sibling.key < node.key)
+						code = "1" + code;
+					else
+						code = "0" + code;
+				}
+				node = getNodeByProperty("key", node.parent);
+			}while(node != null)
+			if(firstNEW&&c=="NEW"){
+				codeBook[c]=0;
+				firstNEW=false;
+				l=1;
+			}
+			else if(c=="NEW") {codeBook[c] = code;l=code.length;}
+			else codeBook[c] = code;
+		}
+	}
+	//文字展示区
+	function displayCodes(){
+		var codesDiv = document.getElementById("codesDiv");
+		
+		codesDiv.innerHTML = "";
+		var codesDiv = document.getElementById("codesDiv");
+		var str="初始编码表:"+"</br>";
+		for(var i = 0; i <num; i++){
+				str+=codeForm.name[i]+":"+codeForm.code[i]+"</br>";
+    }
+		codesDiv.innerHTML=str;
+		{
+      str+="编码过程:"+"</br>";
+			for(c of charsInTree){
+		    //网页右边区域，显示编码/解码的文字过程
+			  codesDiv.innerHTML += c +": " + codeBook[c] + "</br>";
+		  }
+		}
+		var resultSpan = document.getElementById("resultSpan");
+		if(type==1)
+		  resultSpan.innerHTML = "输入值 : " + original + "</br>编码结果 : " + encoded;
+		else
+		  resultSpan.innerHTML = "输入值 : " + original + "</br>解码结果 : " + string;
+	}
+	
+	function getSibling(node){
+		var siblings = getNodesByProperty("parent", node.parent);
+		for (s of siblings){
+			if (s!= node){
+				return s;
+			}
+		}
+		return null;
+	}
+	
+
+
+
+
+
+
+	function processCharacter(c){
+  //处理单个字符
+		var node = getNodeByProperty("character", c);
+		if (c == "_space_"){
+			original += "<mark>_space_</mark>";
+		}
+		else
+			original += c;
+		//检验该字符是否存在
+		if(!node){
+			charsInTree.push(c);
+			var character = c;
+			if (character == "_space_"){
+				character = " ";
+			}
+			encoded += codeBook["NEW"];// + " ";
+			var i;
+			for(i=0;i<num;i++)
+				if(codeForm.name[i]==c){
+			    encoded += codeForm.code[i];// + " ";
+			    break;
+				}
+			if(i==num)
+			{//初始编码表有错误
+				encoded +="[" + c + "]";// + " ";
+			}
+			return addNewEntry(c);
+		}
+		else{
+			encoded += codeBook[c];// + " ";
+			updateNode(node);
+			return node;
+		}
+	}
+  
+	function addNewEntry(c){
+		var nodeChar = {
+			key: NYTKey-1,
+			weight: 1,
+			parent: NYTKey,
+			character: c,
+			changed: true
+		}
+
+		var nodeNYT = {
+			key: NYTKey-2,
+			weight: 0,
+			character: "NEW",
+			parent: NYTKey,
+			changed: true
+		}
+
+		var currentNYT = getNodeByProperty("key", NYTKey);
+		var text = currentNYT.character.replace("NEW","");
+		
+		myDiagram.model.setDataProperty(currentNYT, "character", text);
+		myDiagram.model.addNodeData(nodeChar);
+		myDiagram.model.addNodeData(nodeNYT);
+		NYTKey = NYTKey-2;
+		return getNodeByProperty("key", nodeChar.key);
+	}
+  
+	function updateNode(node){
+		//对已出现过的字符再次出现有问题D
+		var current = node;		
+		var sons = getNodesByProperty("parent", current.key);
+		//找到该节点的子节点
+		
+		var sum = 0;	
+		if (sons.length === 0){	
+			//无子节点
+			sum = node.weight+1;
+		}
+		else{
+			//有子节点
+			for (son of sons){
+				sum += son.weight;
+			}
+		}
+		//alert(current.weight);
+		var weightClass = getNodesByProperty("weight", current.weight);
+		var highest = current;
+		for (w of weightClass){
+			//不和为空的父节点交换
+			if(w.key > highest.key && w.key!=highest.parent)
+				highest = w;
+		}
+		if (current.key !== highest.key && current.key != RootKey && highest.key != RootKey){
+				swap(current, highest);
+		}
+		
+		myDiagram.model.setDataProperty(current, "weight", sum);
+	}
+	
+	function swap(a,b){
+		
+		var aParentKey = getNodeByProperty("key", a.parent).key;
+		var bParentKey = getNodeByProperty("key", b.parent).key;
+		var aKey = a.key;
+		var bKey = b.key;
+		//var aChildren = getNodesByProperty("parent", aKey);
+		//var bChildren = getNodesByProperty("parent", bKey);
+		if(type==1) myDiagram.model.setDataProperty(b, "key", -1);
+		else myDiagram.model.setDataProperty(b, "key", 2);
+		myDiagram.model.setDataProperty(a, "key", bKey);
+		myDiagram.model.setDataProperty(b, "key", aKey);
+		myDiagram.model.setDataProperty(a, "parent", bParentKey);
+		myDiagram.model.setDataProperty(b, "parent", aParentKey);
+	}
+  
+	function getNodeByProperty(prop, val){
+		for (node of myDiagram.model.nodeDataArray){
+			if (node[prop] === val){
+				return node;
+			}
+		}
+		return null;
+	}
+	
+	function getNodesByProperty(prop, val){
+		var nodes = [];
+		for (node of myDiagram.model.nodeDataArray){
+			if (node[prop] === val){
+				nodes.push(node);
+			}
+		}
+		return nodes;
+	}
+  
+	function countUniqChars(s) {
+	  var chars = {}, rv = '';
+
+	  for (var i = 0; i < s.length; ++i) {
+		if (!(s[i] in chars)) {
+		  chars[s[i]] = 1;
+		  rv += s[i];
+		}
+	  }
+
+	  return rv.length;
+	}
+	function onStartButton(){
+		var input = document.getElementById("textInput");
+		var input2 = document.getElementById("textInput2");
+		if(input.value=="") {
+			alert("请输入编码字符串！");
+			return;
+		}
+		type = 1;//编码
+		input.disabled = true;
+		input2.disabled = true;
+		preProcess(input);
+  }
+  function onStartButton2(){
+		var input = document.getElementById("textInput2");
+		var input2 = document.getElementById("textInput");
+  	if(input.value=="") {
+			alert("请输入解码字符串！");
+			return;
+		}
+  	type=2;//解码
+		input.disabled = true;
+		input2.disabled = true;
+		preProcess(input);
+  }
+  //预处理操作
+  function preProcess(input)
+  {
+  	var tmpCodeForm = document.getElementById("textInput3");
+		if (input.value != ""){
+			if(tmpCodeForm.value == "")
+			{
+				alert("请输入初始编码表！");
+				type=0;
+				return;
+			}
+			/*
+			if(type==2){
+				var firstChar = input.value.substring(0,1);
+				if(firstChar=="0"){
+					input.value = input.value.substring(1);
+				  original ="0";
+				}
+			}*/
+			//拆分初始编码表
+		  var codesDiv = document.getElementById("codesDiv");
+			var strArray = tmpCodeForm.value.split("[");
+			var str="初始编码表:";
+			for(var i = 1; i < strArray.length; i++){
+				var tmp=strArray[i].split("]");
+				codeForm.name[i-1]=tmp[0];
+				codeForm.code[i-1]=tmp[1];
+				codeBook[tmp[0]]=tmp[1];
+				str+="</br>"+tmp[0]+":"+tmp[1];
+      }
+      codeBook["NEW"]=0;
+			codesDiv.innerHTML=str;
+      num = strArray.length-1;
+			tmpCodeForm.disabled=true;
+		  generateEmptyGraph();
+		  var buttons = document.getElementsByClassName("stepButton");
+			for(b of buttons){
+				b.style.visibility = "visible";
+			}
+		  var button = document.getElementById("startButton");
+			button.style.visibility = "hidden";
+		  var button = document.getElementById("startButton2");
+			button.style.visibility = "hidden";
+
+		}
+  }
+	
+
+	function encodingFinished(){
+		var buttons = document.getElementsByClassName("stepButton");
+		for(b of buttons){
+			b.style.visibility = "hidden";
+		}
+		
+		var input = document.getElementById("textInput");
+		input.style.visibility = "hidden";
+		
+		var input2 = document.getElementById("textInput2");
+		input2.style.visibility = "hidden";
+
+		var input3 = document.getElementById("textInput3");
+		input3.style.visibility = "hidden";
+
+		var inputSpan = document.getElementById("inputSpan");
+		inputSpan.style.visibility = "hidden";
+		
+		var resetButton = document.getElementById("resetButton");
+		resetButton.style.visibility = "visible";
+	}
+   
+</script>
+</head>
+<body onload="init()">
+<div id="sample">
+  <div style="margin-bottom: 10px; padding: 20px; background-color: aliceblue">
+    <span id="inputSpan" style="display: inline-block; vertical-align: top; padding: 5px;">
+	  请输入要进行编码的字符串: <input type="text" id="textInput"/>
+	  <button type="button" id="startButton" onclick="onStartButton()">开始编码</button><br/>
+	  请输入要进行解码的字符串: <input type="text" id="textInput2"/>
+	  <button type="button" id="startButton2" onclick="onStartButton2()">开始解码</button><br/>
+	  请输初始编码表: <input type="text" id="textInput3"style="width:68%;"/><br>
+	  输入示例:[A]00001[B]00010[C]00011[D]00100<br/>
+	  <button type="button" class="stepButton" onclick="shortStep();">></button>
+	  <button type="button" class="stepButton" onclick="longStep();">>>></button><br/>
+    </span>
+    <span id="resultSpan" style="display:inline-block; vertical-align: top;padding: 5px;margin-left: 50px; ">
+    </span>
+	<span style="display:  inline-block;vertical-align: top;padding: 5px">
+		<button type="button" id="resetButton" onclick="resetForm()">Reset</button>
+	</span>
+	
+
+  </div>
+	<div style=" display: flex;">
+		<div id="myDiagramDiv" style="background-color: white; border: solid 1px black; width: 70%; height: 500px;left: 30px;top: 40px;"></div>
+		<div id="codesDiv" style="background-color: white; border: solid 0px black; margin-left: 50px; padding:5px; width: 23%; height: 500px"></div>
+
+ </div>
+</div>
+</body>
+</html>

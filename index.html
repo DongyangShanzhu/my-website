@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link rel="icon" href="img/favicon.png" type="image/png">
+        <title>Mengyuan Yu</title>
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="vendors/linericon/style.css">
+        <link rel="stylesheet" href="css/font-awesome.min.css">
+        <link rel="stylesheet" href="vendors/owl-carousel/owl.carousel.min.css">
+        <link rel="stylesheet" href="vendors/lightbox/simpleLightbox.css">
+        <link rel="stylesheet" href="vendors/nice-select/css/nice-select.css">
+        <link rel="stylesheet" href="vendors/animate-css/animate.css">
+        <link rel="stylesheet" href="vendors/jquery-ui/jquery-ui.css">
+        <!-- main css -->
+        <link rel="stylesheet" href="css/style.css">
+        <link rel="stylesheet" href="css/responsive.css">
+    </head>
+    <body>
+        
+        <!--================Header Menu Area =================-->
+        <header class="header_area">
+			<div class="main_menu">
+				<nav class="navbar navbar-expand-lg navbar-light">
+					<div class="container box_1620">
+						<!-- Brand and toggle get grouped for better mobile display -->
+                        <img src="img/MyLogo.png" class ="navbar-brand logo_h"alt="">
+						<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<!-- Collect the nav links, forms, and other content for toggling -->
+						<div class="collapse navbar-collapse offset" id="navbarSupportedContent">
+							<ul class="nav navbar-nav menu_nav">
+								<li class="nav-item active"><a class="nav-link" href="index.html">Home</a></li> 
+								<li class="nav-item"><a class="nav-link" href="#Portfolio">Portfolio</a></li>
+								<li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+							</ul>
+						</div> 
+					</div>
+				</nav>
+			</div>
+			<div class="logo_part">
+				<div class="container">
+					<img src="img/myLogo.png" class="logo" alt="">
+				</div>
+			</div>
+        </header>
+        <!--================Header Menu Area =================-->
+        
+        <!--================Home Banner Area =================-->
+        <section class="home_banner_area">
+        	<div class="container">
+				<div class="row">
+					<div class="col-lg-5"></div>
+					<div class="col-lg-7">
+						<div class="blog_text_slider owl-carousel">
+							<div class="item blog_text">
+								<div class="cat">
+									<i class="fa fa-calendar" aria-hidden="true"></i> April 18, 2000
+								</div>
+								<h4> Yu Mengyuan </h4></a>
+								<p>Born in Qingdao, Shandong Province.<br/>Now studying in the School of Artificial Intelligence, Jiangnan University, majoring in Digital Media Technology.</p>
+							</div>
+							<div class="item blog_text">
+								<h4>My Interests</h4>
+								<p>·Record the life with a pen or camera.<br/>·Hand-making such as carving seals and Manual modeling.<br/>·Read mystery novels and see mystery movies.<br/>·Photography<br/>·Traveling</p>
+							</div>
+							<div class="item blog_text">
+								<h4>Learning Experience</h4>
+								<p>In the undergraduate stage, I completed professional courses such as digital image processing, computer vision, AI, human-computer interaction technology, interactive media technology, game programming, UI design, 3D modeling and so on with excellent results.</p>
+								<a class="blog_btn" href="#Portfolio">My Portfolio</a>
+							</div>
+						</div>
+					</div>
+				</div>
+        	</div>
+        </section>
+        <!--================End Home Banner Area =================-->
+        
+        <!--================Blog Area =================-->
+        <section class="blog_area p_120">
+            <div class="container" style="">
+                <div class="row" >
+                	<!--style="border:1px solid red;"-->
+                    <div class="col-lg-8">
+                        <div class="blog_left_sidebar" >
+                        	<nav class="blog-pagination justify-content-center d-flex" id="Portfolio">
+		                        <ul class="pagination">
+		                            <li class="page-item">
+		                                <a href="#" class="page-link" aria-label="Previous">
+		                                    <span aria-hidden="true">
+		                                        <span class="lnr lnr-chevron-left"></span>
+		                                    </span>
+		                                </a>
+		                            </li>
+		                            <li class="page-item myactive page-link" onclick="changeC(this)" value=1 id="li1">AI Project</li>
+		                            <li class="page-item page-link" onclick="changeC(this)" value=2 id="li2">Interaction</li>
+		                            <li class="page-item page-link" onclick="changeC(this)" value=3 id="li3">Software</li>
+		                            <li class="page-item page-link" onclick="changeC(this)" value=4 id="li4">3D Modeling</li>
+		                            <li class="page-item page-link" onclick="changeC(this)" value=5 id="li5">Photography</li>
+		                            <li class="page-item">
+		                                <a href="#" class="page-link" aria-label="Next">
+		                                    <span aria-hidden="true">
+		                                        <span class="lnr lnr-chevron-right"></span>
+		                                    </span>
+		                                </a>
+		                            </li>
+		                        </ul>
+		                    </nav>
+
+		                    <div id="blogs">
+			                    <!--2路径规划-->
+	                            <article class="blog_style1">
+	                            	<div class="blog_img">
+	                            		<img class="img-fluid" src="img/home-blog/blog-2.png" alt="">
+	                            	</div>
+	                            	<div class="blog_text">
+										<div class="blog_text_inner">
+											<div class="cat">
+												<a class="cat_btn">AI Project</a>
+												<i class="fa fa-calendar" aria-hidden="true"></i> April, 2021
+											</div>
+											<h4>配送路线优化系统</h4></a>
+											<p>针对物流配送末端，单快递员配送的条件进行路线的优化，借助百度地图进行数据的获取和结果可视化的显示。<br/>该项目为本人主持的省级大创项目算法的实际应用，获得江苏省计算机设计大赛三等奖。</p>
+											<a class="blog_btn" href="web-original.html">Learn More</a>
+										</div>
+									</div>
+	                            </article>
+			                    <!--1人脸识别-->
+	                            <article class="blog_style1">
+	                            	<div class="blog_img">
+	                            		<img class="img-fluid" src="img/home-blog/blog-1.png" alt="">
+	                            	</div>
+	                            	<div class="blog_text">
+										<div class="blog_text_inner">
+											<div class="cat">
+												<a class="cat_btn">AI Project</a>
+												<i class="fa fa-calendar" aria-hidden="true"></i> October, 2020
+											</div>
+											<h4>人脸识别&语音识别项目</h4></a>
+											<p>借助百度api，实现简单的人脸识别、人脸比对、语音识别和语音合成功能。同时能够动态注册并添加人脸信息。</p>
+											<a class="blog_btn" href="indexAI.html">Learn More</a>
+										</div>
+									</div>
+	                            </article>
+	                        </div>
+                        </div>
+                    </div>
+                    <!--右侧部分-->
+                </div>
+            </div>
+        </section>
+        <!--================Blog Area =================-->
+        
+        <!--================ start footer Area  =================-->	
+        <footer class="footer-area p_20">
+            <div class="row footer-bottom d-flex justify-content-between align-items-center">
+                <p class="col-lg-12 footer-text text-center"><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                    Copyright &copy;<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made  by Yu Mengyuan
+                    <br/>Tel:15861692318  E-mail:1322014804@qq.com
+                    <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+                </p>
+            </div>
+        </footer>
+		<!--================ End footer Area  =================-->
+        
+        <script>
+        	var blogs=document.getElementById("blogs");
+        	var indexC=1;
+        	function changeC(th){
+        		var name="li"+indexC;
+        		document.getElementById(name).classList.remove("myactive");
+        		indexC=th.getAttribute("value");
+        		name="li"+indexC;
+        		document.getElementById(name).classList.add("myactive");
+        		if(indexC==1)
+        		    blogs.innerHTML='<article class="blog_style1"><div class="blog_img"><img class="img-fluid" src="img/home-blog/blog-1.png" alt=""></div><div class="blog_text"><div class="blog_text_inner"><div class="cat"><a class="cat_btn">AI Project</a><i class="fa fa-calendar" aria-hidden="true"></i> October, 2020</div><h4>人脸识别&语音识别项目</h4></a><p>借助百度api，实现简单的人脸识别、人脸比对、语音识别和语音合成功能。同时能够动态注册并添加人脸信息。</p><a class="blog_btn" href="indexAI.html">Learn More</a></div></div></article><!--2路径规划--><article class="blog_style1"><div class="blog_img"><img class="img-fluid" src="img/home-blog/blog-2.png" alt=""></div><div class="blog_text"><div class="blog_text_inner"><div class="cat"><a class="cat_btn">AI Project</a><i class="fa fa-calendar" aria-hidden="true"></i> April, 2021</div><h4>配送路线优化系统</h4></a><p>针对物流配送末端，单快递员配送的条件进行路线的优化，借助百度地图进行数据的获取和结果可视化的显示。<br/>该项目为本人主持的省级大创项目算法的实际应用，获得江苏省计算机设计大赛三等奖。</p><a class="blog_btn" href="web-original.html">Learn More</a></div></div></article>';
+        		else if(indexC==2)
+        			blogs.innerHTML='<!--5kinect体感交互--><article class="blog_style1"><div class="blog_img"><img class="img-fluid" src="img/home-blog/blog-5.jpg" alt=""></div><div class="blog_text"><div class="blog_text_inner"><div class="cat"><a class="cat_btn">Interaction</a><i class="fa fa-calendar" aria-hidden="true"></i> December, 2020</div><h4>体感交互游戏</h4></a><p>使用processing开发，通过kinect获取人的肢体信息，借助粒子效果进行交互效果的呈现。<br/></p><a class="blog_btn" href="5kinect.html">Learn More</a></div></div></article><!--动态画板和--><div class="row"><!--3动态画板--><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/painter.gif" alt=""></div><div class="blog_text"><div class="blog_text_inner"><div class="cat"><a class="cat_btn">Interact</a><i class="fa fa-calendar" aria-hidden="true"></i> September, 2020</div><a href="single-blog.html"><h4>动态画板</h4></a><p>使用p5.js编写的动态画板。<br/>可以修改笔触的样式、颜色、宽度、随机性等，背景的颜色、动态，设置画笔重复绘制的次数等属性。</p><a class="blog_btn" href="painter.html">Learn More</a></div></div></article></div><!--4场景漫游--><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/blog-4.png" alt=""></div><div class="blog_text"><div class="blog_text_inner"><div class="cat"><a class="cat_btn">Interact</a><a href="#"><i class="fa fa-calendar" aria-hidden="true"></i> June ,2020</a><a href="#"><i class="fa fa-comments-o" aria-hidden="true"></i> 05</a></div><h4>Nest Protect 2nd Gen Smoke CO Alarm</h4><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incidid unt ut labore et dolore magna aliqua.</p><a class="blog_btn" href="4scene.html">Learn More</a>	</div></div></article></div></div><!--9Huffman--><article class="blog_style1"><div class="blog_img"><img class="img-fluid" src="img/home-blog/blog-9.png" alt=""></div><div class="blog_text"><div class="blog_text_inner"><div class="cat"><a class="cat_btn">Interact</a><i class="fa fa-calendar" aria-hidden="true"></i> December, 2020</div><h4>Huffman编码过程可视化</h4></a><p>通过树型图可视化Huffman编码和解码的具体过程，帮助理解Huffman编码算法。<br/>支持自定义编码字典。</p><a class="blog_btn" href="haffuman.html">Learn More</a></div></div></article>';
+        		else if(indexC==3)
+        			blogs.innerHTML='<!--6Unity--><article class="blog_style1"><div class="blog_img"><img class="img-fluid" src="img/home-blog/blog-6.png" alt=""></div><div class="blog_text"><div class="blog_text_inner"><div class="cat"><a class="cat_btn">Software</a><i class="fa fa-calendar" aria-hidden="true"></i> January, 2021</div><h4>Single Fligth</h4></a><p>一款通过Unity开发，将模拟飞行与“一笔画”相结合的闯关游戏。玩家通过控制飞机航线来绘制指定图案，以绘制准确率决定是否通关。<br/></p><a class="blog_btn" href="6unity.html">Learn More</a></div></div></article><div class="row"><!--7聊天软件--><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/blog-7.png" alt=""></div><div class="blog_text"><div class="blog_text_inner"><div class="cat"><a class="cat_btn">Software</a><i class="fa fa-calendar" aria-hidden="true"></i> May, 2020</div><a href="7idol.html"><h4>追星交易平台</h4></a><p>使用Qt编写的联网追星交易平台。<br/>包括用户登录注册功能、Idol/商家认证功能、购物、交流聊天功能、动态（图片，视频）发布的功能。</p><!--<a class="blog_btn" href="painter.html">Learn More</a>--></div></div></article></div><!--8图像美化系统--><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/blog-8.png" alt=""></div><div class="blog_text"><div class="blog_text_inner"><div class="cat"><a class="cat_btn">Software</a><a href="#"><i class="fa fa-calendar" aria-hidden="true"></i> December ,2020</a><a href="#">05</a></div><h4>图像美化系统</h4><p>应用程序通过matlab进行开发。<br/>包括图像美化、处理软件，由图像编辑、图像处理、图像增强、边缘检测、图像提取、和多图操作六个板块中的诸多功能，能够帮助用户快速进行一些简单、基础的图像处理操作。</p><a class="blog_btn" href="8photo.html">Learn More</a></div></div></article></div></div>';
+        		else if(indexC==4)
+        			blogs.innerHTML='<!--建模部分--><article class="blog_style1"><div class="blog_img"><img class="img-fluid" src="img/home-blog/3d1.gif" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Animation————Art School</h4></div></article><div class="row"><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/3d2.gif" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Animation————Chocolate</h4></div></article></div><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/3d3.gif" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Animation————Model</h4></div></article></div></div><div class="row"><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/3d4.png" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Model————Character</h4></div></article></div><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/3d5.png" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Model————Car</h4></div></article></div></div><div class="row"><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/3d6.png" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Model————Clock</h4></div></article></div><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/3d7.png" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Model————Mouse</h4></div></article></div></div><article class="blog_style1"><div class="blog_img"><img class="img-fluid" src="img/home-blog/3d11.jpg" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Model————Indoor Scene1</h4></div></article><div class="row"><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/3d9.jpg" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Model————Indoor Scene1</h4></div></article></div><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/3d10.jpg" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Model————Indoor Scene1</h4></div></article></div></div><div class="row"><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/3d8.png" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Model————Jiangnan University1</h4></div></article></div><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/3d9.png" alt=""></div><div class="blog_text" style="text-align: center;padding:2%;" ><h4 style="color:#777777;">3D Model————Jiangnan University2</h4></div></article></div></div>';
+        		else if(indexC==5)
+        			blogs.innerHTML='<!--摄影部分--><div class="row"><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/1.jpg" alt=""></div></article></div><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/15.jpg" alt=""></div></article></div></div><article class="blog_style1"><div class="blog_img"><img class="img-fluid" src="img/home-blog/2.jpg" alt=""></div></article><div class="row"><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/5.jpg" alt=""></div></article></div><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/6.jpg" alt=""></div></article></div></div><div class="row"><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/7.jpg" alt=""></div></article></div><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/8.jpg" alt=""></div></article></div></div><article class="blog_style1"><div class="blog_img"><img class="img-fluid" src="img/home-blog/11.jpg" alt=""></div></article><!--<article class="blog_style1"><div class="blog_img"><img class="img-fluid" src="img/home-blog/12.jpg" alt=""></div></article>	           <div class="row"><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img" ><img class="img-fluid" src="img/home-blog/9.jpg" alt=""></div></article></div><div class="col-md-6"><article class="blog_style1 small"><div class="blog_img"><img class="img-fluid" src="img/home-blog/10.jpg" alt=""></div></article></div></div>  -->';
+        	}
+        </script>
+        
+        
+        
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="js/jquery-3.2.1.min.js"></script>
+        <script src="js/popper.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <script src="js/stellar.js"></script>
+        <script src="vendors/lightbox/simpleLightbox.min.js"></script>
+        <script src="vendors/nice-select/js/jquery.nice-select.min.js"></script>
+        <script src="vendors/isotope/imagesloaded.pkgd.min.js"></script>
+        <script src="vendors/isotope/isotope-min.js"></script>
+        <script src="vendors/owl-carousel/owl.carousel.min.js"></script>
+        <script src="vendors/jquery-ui/jquery-ui.js"></script>
+        <script src="js/jquery.ajaxchimp.min.js"></script>
+        <script src="js/mail-script.js"></script>
+        <script src="js/theme.js"></script>
+    </body>
+</html>

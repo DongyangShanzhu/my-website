@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>人脸比对</title>
+		<script src="js/jquery-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+			<script src="js/jquery-2.1.0.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jquery.particleground.min.js" type="text/javascript" charset="utf-8"></script>
+		<link rel="stylesheet" type="text/css" href="css/styleAI.css" />
+        <script src="js/base.js"></script>
+		<style type="text/css">
+			#dianji:hover{
+				transition: 0.5s;
+				background: skyblue;
+			}
+			.sss{
+				display: inline-block;
+				line-height:100px ;
+				border-radius: 100%; 
+				width: 200px;
+				margin: auto; 
+				height: 200px; 
+				border: 1px solid white;
+				margin-top: 10%;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="adcenter"><script src="http://www.cssmoban.com/include/new/ggad2_728x90.js"></script></div>
+        <div id="large-header" class="large-header">
+					<canvas id="demo-canvas"></canvas> 
+        </div>
+	    <audio controls autoplay>
+        <source id="tts_source" type="audio/mpeg" src="http://tts.baidu.com/text2audio/text2audio?lan=zh&amp;ie=UTF-8&amp;spd=6&amp;text="style="position: absolute;left: 500px;top: 540px;">
+        </audio>
+		<div id="context">
+			<div class="intro">
+				<div style="overflow: hidden; position: relative;top: 40%; overflow: hidden;margin: auto;text-align: center;">
+					<div style="border: 1px solid skyblue; width: 30%; height: 400px;margin-left: 50px; float: left;"><img id="ig1" src="" alt="" style="width: 100%; height: 100%"/></div>
+					<div class="sss">相似度</div>
+					<div style="border: 1px solid skyblue; width: 30%; height: 400px;margin-right: 50px; float: right;"><img id="ig2" src="" alt="" style="width: 100%; height: 100%;"/></div>
+				</div>
+
+				<form id="tttt" method="post" style="width: 80%;  margin:40px auto;">
+					<div id="dianji" style="width: 40%;float: left; position: relative;">
+						<span style="position: absolute;left: 10%;border: 1px solid white;width: 140px;height: 40px;line-height: 40px;border-radius: 15px; margin: auto;">
+						点击上传
+						</span>
+						<input style="opacity: 0; position: absolute;left: 0px; height: 40px;" id="uploading" type="file" onchange="upload1()" name="image1">
+					</div>
+					<div id="dianji" style="float: right;width: 40%;float: right;position: relative;">
+					    <span style="position: absolute;right:10%;border: 1px solid white;width: 140px;height: 40px;line-height: 40px;border-radius: 15px; margin: auto;">
+					 	点击上传
+					 </span>
+					 <input  id="up" type="file" onchange="upload2()" name="image2" style="opacity: 0; position: absolute;right: 0px; height: 40px;" >
+					 </div>
+				</form>
+				<div id="dianji" style="border: 1px solid white;width: 140px;height: 40px;line-height: 40px;border-radius: 15px; margin: auto;">开始比对</div>
+			</div>
+
+		</div>
+	</body>
+	<script type="text/javascript">
+		var flag1=false;
+		var flag2=false;
+
+		window.onload = function init() {
+	    	speckText("当前为人脸比对板块");
+	    }
+	    //语音播报
+	    function speckText(str){
+		    var s = document.getElementById("tts_source");
+		    s.src = "http://tts.baidu.com/text2audio?lan=zh&ie=UTF-8&text=" + str;
+		    s.parentNode.load();
+	    }
+		function upload1() {
+			var file = document.getElementById("uploading").files[0];
+			var fr = new FileReader;
+			var filePath = document.querySelector("#uploading").value;
+			fileFormat = filePath.substring(filePath.lastIndexOf(".")).toLowerCase();
+			if(!fileFormat.match(/.png|.jpg|.jpeg/)) {
+				speckText("警告：文件格式错误");
+				//alert('上传错误,文件格式必须为：png/jpg/jpeg');
+				return;
+			} else {
+				fr.readAsDataURL(file);
+				fr.onload = function(e){
+					document.getElementById("ig1").src = this.result;
+					flag1=true;
+				}
+			}
+		}
+		function upload2() {
+			var file = document.getElementById("up").files[0];
+			var fr = new FileReader;
+			var filePath = document.querySelector("#up").value;
+			fileFormat = filePath.substring(filePath.lastIndexOf(".")).toLowerCase();
+			if(!fileFormat.match(/.png|.jpg|.jpeg/)) {
+				speckText("警告：文件格式错误");
+				//alert('上传错误,文件格式必须为：png/jpg/jpeg');
+				return;
+			} else {
+				fr.readAsDataURL(file);
+				fr.onload = function(e){
+					document.getElementById("ig2").src = this.result;
+					flag2=true;
+				}
+			}
+		}
+		$(function() {
+			$("#dianji").click(function() {
+				if(!flag1) {
+					speckText("请分别上传一张照片");
+					//alert('请分别上传一张照片');
+					return;
+				}
+				if(!flag2){
+					speckText("请分别上传一张照片");
+					//alert('请分别上传一张照片');r
+					eturn;
+				}
+				speckText("开始比对");
+				$.ajax({
+					url: basePath+"/FaceMatch",
+					type: 'post',
+					cache: false,
+					data: new FormData($('#tttt')[0]),
+					processData: false,
+					contentType: false,
+					dataType: "json",
+					beforeSend: function() {
+						uploading = true;
+						
+					},
+					success: function(data) {
+						if(data.status==200){
+							document.querySelector(".sss").innerHTML="相似度<br>"+data.data.score;
+							speckText("相似度为：百分之"+data.data.score);
+						}else{
+							$(".sss").html("相似度<br><span style='color:red'>"+data.msg+"</span>");
+						}
+						
+					},
+					error(xhr,status,error){
+						speckText("后台服务异常");
+						$(".sss").html("相似度<br><span style='color:red'>后台服务异常</span>");
+						return;
+					}
+				});
+			});
+		});
+	</script>
+
+<script src="js/TweenLite.min.js"></script>
+<script src="js/EasePack.min.js"></script>
+<script src="js/rAF.js"></script>
+<script src="js/demo-1.js"></script> 
+
+<script>
+    /*
+    //随机粒子背景 没用上，删除前面四个script就用上了
+    $(document).ready(function() {
+        $('#context').particleground({
+            dotColor: '#5cbdaa',
+            lineColor: '#5cbdaa'
+    });
+    */
+    //位置偏移控制
+	$('.intro').css({
+	    'margin-top': -($('.intro').height() / 2)
+    });
+</script>>
+</html>
